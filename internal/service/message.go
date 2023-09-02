@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	CommitMessagePrompt = "Generate commit messages for [%s]. Each message should be separated by only space"
+	CommitMessagePrompt = "Generate up to 5 commit messages for [%s]. Each message should be separated by only space"
 	FormatNotice        = ", format commit as:\n- feat: [feature description]\n- bugfix: [bugfix description]"
 )
 
