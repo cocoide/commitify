@@ -19,7 +19,7 @@ const (
 var suggestCmd = &cobra.Command{
 	Use:   "suggest",
 	Short: "Suggestion of commit message for staging repository",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args [] string) {
 		util.LoadEnv()
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
