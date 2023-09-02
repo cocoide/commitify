@@ -43,12 +43,12 @@ func (og *openAIGateway) GetAnswerFromPrompt(prompt string, variability float32)
 }
 
 func (og *openAIGateway) AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string {
-	responseCh := make(chan string, 1)
+	resCh := make(chan string, 1)
 
 	go func() {
 		answer, _ := og.GetAnswerFromPrompt(prompt, variability)
-		responseCh <- answer
+		resCh <- answer
 	}()
 
-	return responseCh
+	return resCh
 }
