@@ -2,19 +2,20 @@ package service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/util"
 )
 
 const (
-	CommitMessagePrompt = "Generate 3 commit messages for [%s], each message separated by a comma and a space"
+	CommitMessagePrompt = "Generate commit messages for [%s]. Each message should be separated by only space"
 	FormatNotice        = ", format commit as:\n- feat: [feature description]\n- bugfix: [bugfix description]"
 )
 
 // メッセージの生成、加工に関するクラス
 type MessageService interface {
-	AsyncGenerateCommitMessage() (<-chan string, error)
+	AsyncGenerateCommitMessage() ([]string, error)
 }
 
 type messageService struct {
@@ -25,7 +26,7 @@ func NewMessageService(og gateway.OpenAIGateway) MessageService {
 	return &messageService{og: og}
 }
 
-func (s *messageService) AsyncGenerateCommitMessage() (<-chan string, error) {
+func (s *messageService) AsyncGenerateCommitMessage() ([]string, error) {
 	var result <-chan string
 	stagingCode := util.ExecGetStagingCode()
 	if len(stagingCode) < 1 {
@@ -33,5 +34,6 @@ func (s *messageService) AsyncGenerateCommitMessage() (<-chan string, error) {
 	}
 	prompt := fmt.Sprintf(CommitMessagePrompt, string(stagingCode))
 	result = s.og.AsyncGetAnswerFromPrompt(prompt, 0.01)
-	return result, nil
+	messages := strings.Split(<-result, "\n")
+	return messages, nil
 }

@@ -65,8 +65,8 @@ func (m model) View() string {
 			b.WriteString(fmt.Sprintf("   %s\n", choice))
 		}
 	}
-
-	b.WriteString("\nUse the arrow keys to navigate and press Enter to select.")
+	green := color.New(color.FgGreen).SprintFunc()
+	b.WriteString(green("\nUse the arrow keys to navigate and press Enter to select."))
 	return b.String()
 }
 
@@ -79,13 +79,14 @@ var suggestCmd = &cobra.Command{
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
 		ms := service.NewMessageService(og)
-		msgCh, err := ms.AsyncGenerateCommitMessage()
+		messages, err := ms.AsyncGenerateCommitMessage()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		suggestMsg := <-msgCh
-		fmt.Println(suggestMsg)
-		choices := []string{suggestMsg, "!", "!#!"}
+		var choices []string
+		for _, v := range messages {
+			choices = append(choices, v)
+		}
 		m := model{choices: choices}
 		p := tea.NewProgram(m)
 		p.Run()
