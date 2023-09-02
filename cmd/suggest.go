@@ -38,8 +38,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case tea.KeyEnter:
 			if err := util.ExecCommitMessage(m.choices[m.currentIdx]); err != nil {
-				m.errorMsg = err.Error()
-				return m, nil
+				m.errorMsg = "コミットエラーが発生"
+				return m, tea.Quit
 			}
 			return m, tea.Quit
 		case tea.KeyCtrlC, tea.KeyEsc:
@@ -52,7 +52,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var b strings.Builder
 	if m.errorMsg != "" {
-		// エラーメッセージを赤色で表示
 		red := color.New(color.FgRed).SprintFunc()
 		b.WriteString(red(m.errorMsg) + "\n\n")
 	}
@@ -86,7 +85,7 @@ var suggestCmd = &cobra.Command{
 		}
 		suggestMsg := <-msgCh
 		fmt.Println(suggestMsg)
-		choices := []string{"32", "!", "!#!"}
+		choices := []string{suggestMsg, "!", "!#!"}
 		m := model{choices: choices}
 		p := tea.NewProgram(m)
 		p.Run()
