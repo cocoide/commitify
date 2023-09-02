@@ -15,7 +15,7 @@ const (
 
 // メッセージの生成、加工に関するクラス
 type MessageService interface {
-	AsyncGenerateCommitMessage() ([]string, error)
+	GenerateCommitMessage() ([]string, error)
 }
 
 type messageService struct {
@@ -26,7 +26,7 @@ func NewMessageService(og gateway.OpenAIGateway) MessageService {
 	return &messageService{og: og}
 }
 
-func (s *messageService) AsyncGenerateCommitMessage() ([]string, error) {
+func (s *messageService) GenerateCommitMessage() ([]string, error) {
 	var result <-chan string
 	stagingCode := util.ExecGetStagingCode()
 	if len(stagingCode) < 1 {
