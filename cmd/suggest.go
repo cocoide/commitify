@@ -55,18 +55,19 @@ func (m model) View() string {
 		red := color.New(color.FgRed).SprintFunc()
 		b.WriteString(red(m.errorMsg) + "\n\n")
 	}
-	b.WriteString("Please select an option:\n\n")
+	white := color.New(color.FgWhite).SprintFunc()
+	b.WriteString(white("Please select an option:"))
+	b.WriteString(white("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
 
 	for i, choice := range m.choices {
-		blue := color.New(color.FgCyan).SprintFunc()
+		cyan := color.New(color.FgCyan).SprintFunc()
+		hiCyan := color.New(color.FgHiCyan).SprintFunc()
 		if i == m.currentIdx {
-			b.WriteString(fmt.Sprintf(blue("-> %s\n"), choice))
+			b.WriteString(fmt.Sprintf(hiCyan("➡️  %s\n"), choice))
 		} else {
-			b.WriteString(fmt.Sprintf("   %s\n", choice))
+			b.WriteString(fmt.Sprintf(cyan("    %s\n"), choice))
 		}
 	}
-	green := color.New(color.FgGreen).SprintFunc()
-	b.WriteString(green("\nUse the arrow keys to navigate and press Enter to select."))
 	return b.String()
 }
 
