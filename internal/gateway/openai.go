@@ -2,8 +2,9 @@ package gateway
 
 import (
 	"context"
-	"os"
+	"log"
 
+	"github.com/cocoide/commitify/util"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -18,8 +19,11 @@ type openAIGateway struct {
 }
 
 func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
-	OPENAI_SECRET := os.Getenv("OPENAI_SECRET")
-	client := openai.NewClient(OPENAI_SECRET)
+	config, err := util.ReadConfig()
+	if err != nil {
+		log.Fatalf("Failed to read config: %v", err)
+	}
+	client := openai.NewClient(config.ChatGptToken)
 	return &openAIGateway{client: client, ctx: ctx}
 }
 
