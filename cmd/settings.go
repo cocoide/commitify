@@ -3,33 +3,37 @@ package cmd
 import (
 	"fmt"
 	"log"
+
+	"github.com/cocoide/commitify/util"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var setAPIKeyCmd = &cobra.Command{
 	Use:   "set-apikey [api_key]",
 	Short: "API Key settings for ChatGPT",
-	Args: cobra.ExactArgs(1),
-	Run: func (cmd *cobra.Command, args [] string) {
-		apikey := args[0]
-		viper.Set("chatgpt.api_key", apikey)
-		if err := viper.WriteConfig(); err != nil {
-			log.Fatal("An error occurred while writing the configuration file:", err)
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		config, _ := util.ReadConfig()
+		config.ChatGptToken = args[0]
+		if err := util.WriteConfig(config); err != nil {
+			log.Fatal("Failed to write into config", err)
 		}
-		fmt.Println("ChatGPT API key has been set")
+		fmt.Println("ChatGPT Token has been set")
 	},
 }
 
 var showAPIKeyCmd = &cobra.Command{
-	Use: "show-apikey",
+	Use:   "show-apikey",
 	Short: "Display ChatGPT API key",
-	Run: func (cmd *cobra.Command, args [] string)  {
-		apikey := viper.GetString("chatgpt.api_key")
-		if apikey == "" {
+	Run: func(cmd *cobra.Command, args []string) {
+		config, err := util.ReadConfig()
+		if err != nil {
+			log.Fatal("Failed to read config:", err)
+		}
+		if config.ChatGptToken == "" {
 			fmt.Println("API key is not set")
 		} else {
-			fmt.Println("ChatGPT APIKey:", apikey)
+			fmt.Println("ChatGPT APIKey:", config.ChatGptToken)
 		}
 	},
 }
