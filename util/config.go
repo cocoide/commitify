@@ -3,7 +3,6 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/spf13/viper"
@@ -11,14 +10,6 @@ import (
 
 func ReadConfig() (*entity.Config, error) {
 	var result entity.Config
-
-	// configファイルがあるかどうかを確認
-	_, err := os.Stat("config.yaml")
-	if os.IsNotExist(err) {
-		if _, err := os.Create("config.yaml"); err != nil {
-			return &result, fmt.Errorf("error creating config file, %s", err.Error())
-		}
-	}
 
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
@@ -33,14 +24,6 @@ func ReadConfig() (*entity.Config, error) {
 }
 
 func WriteConfig(config *entity.Config) error {
-	// configファイルがあるかどうかを確認
-	_, err := os.Stat("config.yaml")
-	if !os.IsNotExist(err) {
-		if _, err := os.Create("config.yaml"); err != nil {
-			return fmt.Errorf("error creating config file, %s", err.Error())
-		}
-	}
-
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
