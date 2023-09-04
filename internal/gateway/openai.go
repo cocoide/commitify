@@ -23,7 +23,7 @@ func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
-	client := openai.NewClient(config.ChatGptToken)
+	client := openai.NewClient(config.ChatGptApiKey)
 	return &openAIGateway{client: client, ctx: ctx}
 }
 

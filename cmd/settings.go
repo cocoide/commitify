@@ -14,7 +14,7 @@ var setAPIKeyCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		config, _ := util.ReadConfig()
-		config.ChatGptToken = args[0]
+		config.ChatGptApiKey = args[0]
 		if err := util.WriteConfig(config); err != nil {
 			log.Fatal("Failed to write into config", err)
 		}
@@ -30,10 +30,10 @@ var showAPIKeyCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("Failed to read config:", err)
 		}
-		if config.ChatGptToken == "" {
+		if config.ChatGptApiKey == "" {
 			fmt.Println("API key is not set")
 		} else {
-			fmt.Println("ChatGPT APIKey:", config.ChatGptToken)
+			fmt.Println("ChatGPT APIKey:", config.ChatGptApiKey)
 		}
 	},
 }
