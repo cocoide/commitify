@@ -18,6 +18,7 @@ type model struct {
 	currentIdx int
 	errorMsg   string
 	isLoading  bool
+	animationIdx int
 	messages   []string
 }
 
@@ -70,6 +71,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		}
+	case tea.Cmd:
+		if m.isLoading {
+			m.animationIdx = (m.animationIdx + 1) % 3
+		}
 	}
 	return m, nil
 }
@@ -80,7 +85,9 @@ func (m model) View() string {
 		return fmt.Sprintf(red(m.errorMsg))
 	}
 	if m.isLoading {
-		return "🌎 Generating commit messages ..."
+		AnimationEarth := []string{"🌎","🌍","🌏"}
+		AnimationPoint := []string{".","..","..."}
+		return fmt.Sprintf("%s Generating commit messages %s", AnimationEarth[m.animationIdx], AnimationPoint[m.animationIdx])
 	}
 	var b strings.Builder
 	if m.errorMsg != "" {
