@@ -28,7 +28,6 @@ type generateMessages struct {
 
 func (m model) Init() tea.Cmd {
 	return func() tea.Msg {
-		util.LoadEnv()
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
 		ms := service.NewMessageService(og)
