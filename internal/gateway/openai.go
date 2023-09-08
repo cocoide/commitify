@@ -8,6 +8,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+//go:generate mockgen -source=openai.go -destination=../../mock/openai.go
 type OpenAIGateway interface {
 	GetAnswerFromPrompt(prompt string, variability float32) (string, error)
 	AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string
