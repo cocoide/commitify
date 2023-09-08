@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/cocoide/commitify/internal/gateway"
-	"github.com/cocoide/commitify/util"
 )
 
 const (
@@ -13,9 +12,11 @@ const (
 	FormatNotice        = ", format commit as:\n- feat: [feature description]\n- bugfix: [bugfix description]"
 )
 
+var PromptVariability float32 = 0.01
+
 // メッセージの生成、加工に関するクラス
 type MessageService interface {
-	GenerateCommitMessage() ([]string, error)
+	GenerateCommitMessage(stagingCode string) ([]string, error)
 }
 
 type messageService struct {
@@ -26,14 +27,15 @@ func NewMessageService(og gateway.OpenAIGateway) MessageService {
 	return &messageService{og: og}
 }
 
-func (s *messageService) GenerateCommitMessage() ([]string, error) {
-	var result <-chan string
-	stagingCode := util.ExecGetStagingCode()
+func (s *messageService) GenerateCommitMessage(stagingCode string) ([]string, error) {
 	if len(stagingCode) < 1 {
 		return nil, fmt.Errorf("There is no staging code")
 	}
-	prompt := fmt.Sprintf(CommitMessagePrompt, string(stagingCode))
-	result = s.og.AsyncGetAnswerFromPrompt(prompt, 0.01)
-	messages := strings.Split(<-result, "\n")
+	prompt := fmt.Sprintf(CommitMessagePrompt, stagingCode)
+	result, err := s.og.GetAnswerFromPrompt(prompt, PromptVariability)
+	if err != nil {
+		return nil, err
+	}
+	messages := strings.Split(result, "\n")
 	return messages, nil
 }

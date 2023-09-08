@@ -31,7 +31,8 @@ func (m model) Init() tea.Cmd {
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
 		ms := service.NewMessageService(og)
-		messages, err := ms.GenerateCommitMessage()
+		stagingCode := util.ExecGetStagingCode()
+		messages, err := ms.GenerateCommitMessage(stagingCode)
 		if err != nil {
 			return generateMessages{errorMsg: "メッセージの生成に失敗: " + err.Error()}
 		}
