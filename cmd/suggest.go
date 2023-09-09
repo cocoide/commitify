@@ -31,11 +31,11 @@ type generateMessages struct {
 
 func (m model) Init() tea.Cmd {
 	return func() tea.Msg {
-		util.LoadEnv()
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
 		ms := service.NewMessageService(og)
-		messages, err := ms.GenerateCommitMessage()
+		stagingCode := util.ExecGetStagingCode()
+		messages, err := ms.GenerateCommitMessage(stagingCode)
 		if err != nil {
 			return generateMessages{errorMsg: "メッセージの生成に失敗: " + err.Error()}
 		}
@@ -89,8 +89,7 @@ func (m *model) resetSpinner() {
 
 func (m model) View() string {
 	if m.errorMsg != "" {
-		red := color.New(color.FgRed).SprintFunc()
-		return fmt.Sprintf(red(m.errorMsg))
+		return color.RedString(m.errorMsg)
 	}
 	if m.isLoading {
 		s := fmt.Sprintf("\n %s %s\n\n", m.spinner.View(), textStyle("Generating commit messages..."))
@@ -98,20 +97,16 @@ func (m model) View() string {
 	}
 	var b strings.Builder
 	if m.errorMsg != "" {
-		red := color.New(color.FgRed).SprintFunc()
-		b.WriteString(red(m.errorMsg) + "\n\n")
+		b.WriteString(color.RedString(m.errorMsg) + "\n\n")
 	}
-	white := color.New(color.FgWhite).SprintFunc()
-	b.WriteString(white("🍕Please select an option:"))
-	b.WriteString(white("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
+	b.WriteString(color.WhiteString("🍕Please select an option:"))
+	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
 
 	for i, choice := range m.choices {
-		cyan := color.New(color.FgCyan).SprintFunc()
-		hiCyan := color.New(color.FgHiCyan).SprintFunc()
 		if i == m.currentIdx {
-			b.WriteString(fmt.Sprintf(hiCyan("➡️  %s\n"), choice))
+			b.WriteString(fmt.Sprintf(color.HiCyanString("➡️  %s\n"), choice))
 		} else {
-			b.WriteString(fmt.Sprintf(cyan("    %s\n"), choice))
+			b.WriteString(fmt.Sprintf(color.CyanString("    %s\n"), choice))
 		}
 	}
 	return b.String()
