@@ -14,7 +14,7 @@ import (
 // docsCmd represents the docs command
 var docsCmd = &cobra.Command{
 	Use:   "docs",
-	Short: "Document of committify",
+	Short: "Document of commitify",
 	Run: func(cmd *cobra.Command, args []string) {
 		b, _ := static.Logo.ReadFile("logo.txt")
 		cyan := color.New(color.FgCyan).SprintFunc()
