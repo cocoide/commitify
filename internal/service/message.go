@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/cocoide/commitify/internal/gateway"
@@ -37,5 +38,19 @@ func (s *messageService) GenerateCommitMessage(stagingCode string) ([]string, er
 		return nil, err
 	}
 	messages := strings.Split(result, "\n")
+	pattern := regexp.MustCompile(`^(\d.\s+)|^(-\s+)|^(\s+)`)
+	newline := regexp.MustCompile(`\.`)
+	for i, s := range(messages){
+		if pattern.MatchString(s){
+			messages[i] = pattern.ReplaceAllString(s, "")
+		} else {
+			messages = newline.Split(s, -1)
+			for j, c := range(messages){
+				messages[j] = pattern.ReplaceAllString(c + "\n", "")
+			}
+			fmt.Println(messages)
+			break
+		}
+	}
 	return messages, nil
 }
