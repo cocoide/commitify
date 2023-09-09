@@ -1,5 +1,7 @@
 package entity
 
 type Config struct {
-	ChatGptToken string `json:"chatGptToken"`
+	ChatGptApiKey string `json:"chatGptApiKey"`
+	UseLanguage   string `json:"UseLanguage"`
+	CommitFormat  string `json:"CommitFormat"`
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+//go:generate mockgen -source=openai.go -destination=../../mock/openai.go
 type OpenAIGateway interface {
 	GetAnswerFromPrompt(prompt string, variability float32) (string, error)
 	AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string
@@ -23,7 +24,7 @@ func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
-	client := openai.NewClient(config.ChatGptToken)
+	client := openai.NewClient(config.ChatGptApiKey)
 	return &openAIGateway{client: client, ctx: ctx}
 }
 

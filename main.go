@@ -1,20 +1,19 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/cocoide/commitify/cmd"
-	"github.com/spf13/viper"
 )
 
 func main() {
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.SetConfigType("yaml")
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Println("An error occurred while reading the configuration file:", err)
+	// configファイルがあるかどうかを確認
+	_, err := os.Stat("config.yaml")
+	if os.IsNotExist(err) {
+		if _, err := os.Create("config.yaml"); err != nil {
+			fmt.Printf("error creating config file, %s", err.Error())
+		}
 	}
 
 	cmd.Execute()

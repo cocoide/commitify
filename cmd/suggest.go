@@ -28,11 +28,11 @@ type generateMessages struct {
 
 func (m model) Init() tea.Cmd {
 	return func() tea.Msg {
-		util.LoadEnv()
 		ctx := context.Background()
 		og := gateway.NewOpenAIGateway(ctx)
 		ms := service.NewMessageService(og)
-		messages, err := ms.GenerateCommitMessage()
+		stagingCode := util.ExecGetStagingCode()
+		messages, err := ms.GenerateCommitMessage(stagingCode)
 		if err != nil {
 			return generateMessages{errorMsg: "メッセージの生成に失敗: " + err.Error()}
 		}
