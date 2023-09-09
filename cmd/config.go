@@ -120,17 +120,14 @@ func (cm configModel) View() string {
 	switch cm.configKeySelected {
 	// 設定項目を選んでいない時
 	case false:
-		white := color.New(color.FgWhite).SprintFunc()
-		b.WriteString(white("設定項目を選んでください:\n"))
-		b.WriteString(white("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
+		b.WriteString(color.WhiteString("設定項目を選んでください:\n"))
+		b.WriteString(color.WhiteString("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
 
 		for i, choice := range configKey {
-			cyan := color.New(color.FgCyan).SprintFunc()
-			hiCyan := color.New(color.FgHiCyan).SprintFunc()
 			if i == cm.configKeyIndex {
-				b.WriteString(fmt.Sprintf(hiCyan("➡️  %s\n"), choice))
+				b.WriteString(fmt.Sprintf(color.HiCyanString("➡️  %s\n"), choice))
 			} else {
-				b.WriteString(fmt.Sprintf(cyan("    %s\n"), choice))
+				b.WriteString(fmt.Sprintf(color.CyanString("    %s\n"), choice))
 			}
 		}
 
@@ -139,26 +136,22 @@ func (cm configModel) View() string {
 		// 選択肢のない項目はテキストエリアを表示
 		switch len(configOption[cm.configKeyIndex]) {
 		case 0:
-			white := color.New(color.FgWhite).SprintFunc()
-			b.WriteString(white(fmt.Sprintf(
+			b.WriteString(color.WhiteString(fmt.Sprintf(
 				"ここに%sを入力: %s\n",
 				configKey[cm.configKeyIndex],
 				cm.textInput.View(),
 			)))
-			b.WriteString(white("  Enterキーで確定"))
+			b.WriteString(color.WhiteString("  Enterキーで確定"))
 
 		default:
-			white := color.New(color.FgWhite).SprintFunc()
-			b.WriteString(white("設定内容を選んでください:\n"))
-			b.WriteString(white("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
+			b.WriteString(color.WhiteString("設定内容を選んでください:\n"))
+			b.WriteString(color.WhiteString("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
 
 			for i, option := range configOption[cm.configKeyIndex] {
-				cyan := color.New(color.FgCyan).SprintFunc()
-				hiCyan := color.New(color.FgHiCyan).SprintFunc()
 				if i == cm.configOptionIndex {
-					b.WriteString(fmt.Sprintf(hiCyan("➡️  %s\n"), option))
+					b.WriteString(fmt.Sprintf(color.HiCyanString("➡️  %s\n"), option))
 				} else {
-					b.WriteString(fmt.Sprintf(cyan("    %s\n"), option))
+					b.WriteString(fmt.Sprintf(color.CyanString("    %s\n"), option))
 				}
 			}
 		}
