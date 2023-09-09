@@ -16,7 +16,11 @@ jobs:
           fetch-depth: 0 # Changelog を正しく動作させるために必要
 
       - name: Install GoReleaser and mockgen
-        run: go get github.com/golang/mock/mockgen
+        run: |
+          wget https://github.com/goreleaser/goreleaser/releases/latest/download/goreleaser_amd64 -O /tmp/goreleaser
+          chmod +x /tmp/goreleaser
+          sudo mv /tmp/goreleaser /usr/local/bin/goreleaser
+          go get github.com/golang/mock/mockgen
         env:
           GO111MODULE: on
       # Go をセットアップ
