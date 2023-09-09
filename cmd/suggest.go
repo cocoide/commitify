@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/internal/service"
@@ -14,12 +15,13 @@ import (
 )
 
 type model struct {
-	choices    []string
-	currentIdx int
-	errorMsg   string
-	isLoading  bool
+	choices      []string
+	currentIdx   int
+	errorMsg     string
+	isLoading    bool
 	animationIdx int
-	messages   []string
+	messages     []string
+	spinner spinner.Model
 }
 
 type generateMessages struct {
@@ -71,12 +73,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		}
-	case tea.Cmd:
-		if m.isLoading {
-			m.animationIdx = (m.animationIdx + 1) % 3
-		}
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	}
 	return m, nil
+}
+
+func (m *model) resetSpinner() {
+	m.spinner = spinner.New()
+	m.spinner.Style = spinnerStyle
+	m.spinner.Spinner = spinner.Globe
 }
 
 func (m model) View() string {
@@ -85,9 +93,8 @@ func (m model) View() string {
 		return fmt.Sprintf(red(m.errorMsg))
 	}
 	if m.isLoading {
-		AnimationEarth := []string{"🌎","🌍","🌏"}
-		AnimationPoint := []string{".","..","..."}
-		return fmt.Sprintf("%s Generating commit messages %s", AnimationEarth[m.animationIdx], AnimationPoint[m.animationIdx])
+		s := fmt.Sprintf("\n %s %s\n\n", m.spinner.View(), textStyle("Generating commit messages..."))
+		return s
 	}
 	var b strings.Builder
 	if m.errorMsg != "" {
@@ -116,6 +123,7 @@ var suggestCmd = &cobra.Command{
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
 		m := model{isLoading: true}
+		m.resetSpinner()
 		p := tea.NewProgram(m)
 		p.Run()
 	},
