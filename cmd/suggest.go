@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
-	"github.com/cocoide/commitify/internal/service"
 	"github.com/cocoide/commitify/util"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -18,39 +19,35 @@ type model struct {
 	currentIdx int
 	errorMsg   string
 	isLoading  bool
-	messages   []string
 }
 
-type generateMessages struct {
-	messages []string
-	errorMsg string
-}
-
-func (m model) Init() tea.Cmd {
-	return func() tea.Msg {
-		ctx := context.Background()
-		og := gateway.NewOpenAIGateway(ctx)
-		ms := service.NewMessageService(og)
-		stagingCode := util.ExecGetStagingCode()
-		messages, err := ms.GenerateCommitMessage(stagingCode)
-		if err != nil {
-			return generateMessages{errorMsg: "メッセージの生成に失敗: " + err.Error()}
-		}
-		return generateMessages{messages: messages}
+func (m *model) Init() tea.Cmd {
+	conf, err := entity.ReadConfig()
+	if err != nil {
+		log.Fatal("設定情報の取得に失敗: ", err)
 	}
+
+	var gi gateway.GatewayInterface
+	switch conf.AISource {
+	case int(entity.WrapServer):
+		gi = gateway.NewGrpcServeGateway()
+	default:
+		gi = gateway.NewGrpcServeGateway()
+	}
+
+	messages, err := gi.FetchCommitMessages()
+	if err != nil {
+		log.Fatal("コミットメッセージの生成に失敗: ", err)
+		os.Exit(-1)
+	}
+	m.choices = messages
+	m.isLoading = false
+
+	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case generateMessages:
-		if msg.errorMsg != "" {
-			m.errorMsg = msg.errorMsg
-			m.isLoading = false
-			return m, nil
-		}
-		m.choices = msg.messages
-		m.isLoading = false
-		return m, nil
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyUp:
@@ -74,7 +71,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	if m.errorMsg != "" {
 		red := color.New(color.FgRed).SprintFunc()
 		return fmt.Sprintf(red(m.errorMsg))
@@ -109,7 +106,7 @@ var suggestCmd = &cobra.Command{
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
 		m := model{isLoading: true}
-		p := tea.NewProgram(m)
+		p := tea.NewProgram(&m)
 		p.Run()
 	},
 }
