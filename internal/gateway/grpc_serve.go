@@ -41,7 +41,7 @@ func NewGrpcServeGateway() *grpcServeGateway {
 
 func (gsg grpcServeGateway) FetchCommitMessages() ([]string, error) {
 	// 設定情報からOpenAIへのアクセス方法の変更
-	// if conf, err := util.ReadConfig(); err != nil {
+	// if conf, err := entity.ReadConfig(); err != nil {
 	// 	fmt.Printf("設定ファイルが開けません: %v", err)
 	// }
 

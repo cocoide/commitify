@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/cocoide/commitify/util"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -182,7 +182,7 @@ func init() {
 }
 
 func saveConfig(cm configModel) {
-	currentConfig, err := util.ReadConfig()
+	currentConfig, err := entity.ReadConfig()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -196,7 +196,7 @@ func saveConfig(cm configModel) {
 		currentConfig.CommitFormat = configOption[cm.configKeyIndex][cm.configOptionIndex]
 	}
 
-	err = util.WriteConfig(currentConfig)
+	err = entity.WriteConfig(currentConfig)
 	if err != nil {
 		fmt.Println(err)
 	}
