@@ -12,11 +12,18 @@ import (
 )
 
 var (
-	configKey    = [...]string{"api-key", "language", "format"}
-	configOption = [][]string{
+	configKey    = [...]string{"api-key", "language", "format", "ai-source"}
+	configOption = [][]int{
+		{},
+		{int(entity.JP), int(entity.EN)},
+		{int(entity.NormalFormat), int(entity.EmojiFormat), int(entity.PrefixFormat)},
+		{int(entity.WrapServer), int(entity.OpenAiAPI)},
+	}
+	configOptionLabel = [][]string{
 		{},
 		{"Japanese", "English"},
-		{"Format 1", "Format 2"},
+		{"Normal Format", "Emoji Format", "PrefixFormat"},
+		{"Wrap Server", "OpenAI API"},
 	}
 )
 
@@ -152,7 +159,7 @@ func (cm configModel) View() string {
 			b.WriteString(white("設定内容を選んでください:\n"))
 			b.WriteString(white("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
 
-			for i, option := range configOption[cm.configKeyIndex] {
+			for i, option := range configOptionLabel[cm.configKeyIndex] {
 				cyan := color.New(color.FgCyan).SprintFunc()
 				hiCyan := color.New(color.FgHiCyan).SprintFunc()
 				if i == cm.configOptionIndex {
@@ -194,6 +201,8 @@ func saveConfig(cm configModel) {
 		currentConfig.UseLanguage = configOption[cm.configKeyIndex][cm.configOptionIndex]
 	case 2:
 		currentConfig.CommitFormat = configOption[cm.configKeyIndex][cm.configOptionIndex]
+	case 3:
+		currentConfig.AISource = configOption[cm.configKeyIndex][cm.configOptionIndex]
 	}
 
 	err = entity.WriteConfig(currentConfig)
