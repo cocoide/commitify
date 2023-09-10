@@ -154,7 +154,7 @@ func (cm configModel) View() string {
 			b.WriteString(color.WhiteString("設定内容を選んでください:\n"))
 			b.WriteString(color.WhiteString("  ↑↓の矢印キーで項目を移動、Enterで選択\n"))
 
-			for i, option := range configOption[cm.configKeyIndex] {
+			for i, option := range configOptionLabel[cm.configKeyIndex] {
 				if i == cm.configOptionIndex {
 					b.WriteString(fmt.Sprintf(color.HiCyanString("➡️  %s\n"), option))
 				} else {
