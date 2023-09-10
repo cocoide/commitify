@@ -3,9 +3,11 @@ package gateway
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/service"
 	pb "github.com/cocoide/commitify/pkg/grpc"
 	"google.golang.org/grpc"
@@ -40,10 +42,12 @@ func NewGrpcServeGateway() *grpcServeGateway {
 }
 
 func (gsg grpcServeGateway) FetchCommitMessages() ([]string, error) {
-	// 設定情報からOpenAIへのアクセス方法の変更
-	// if conf, err := entity.ReadConfig(); err != nil {
-	// 	fmt.Printf("設定ファイルが開けません: %v", err)
-	// }
+	// 設定情報を取得
+	conf, err := entity.ReadConfig()
+	if err != nil {
+		fmt.Printf("設定ファイルが開けません: %v", err)
+	}
+	cft, lt := conf.Config2PbVars()
 
 	fds := service.NewFileDiffService()
 
@@ -55,8 +59,8 @@ func (gsg grpcServeGateway) FetchCommitMessages() ([]string, error) {
 
 	req := &pb.CommitMessageRequest{
 		InputCode:  diffStr,
-		CodeFormat: pb.CodeFormatType_PREFIX,
-		Language:   pb.LanguageType_ENGLISH,
+		CodeFormat: cft,
+		Language:   lt,
 	}
 
 	res, err := gsg.client.GenerateCommitMessage(context.Background(), req)
