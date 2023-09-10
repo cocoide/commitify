@@ -9,11 +9,18 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/util"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+)
+
+var (
+	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Render
+	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
+	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
 )
 
 type model struct {
