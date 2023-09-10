@@ -15,13 +15,13 @@ var (
 	configKey    = [...]string{"api-key", "language", "format", "ai-source"}
 	configOption = [][]int{
 		{},
-		{int(entity.JP), int(entity.EN)},
+		{int(entity.EN), int(entity.JP)},
 		{int(entity.NormalFormat), int(entity.EmojiFormat), int(entity.PrefixFormat)},
 		{int(entity.WrapServer), int(entity.OpenAiAPI)},
 	}
 	configOptionLabel = [][]string{
 		{},
-		{"Japanese", "English"},
+		{"English", "Japanese"},
 		{"Normal Format", "Emoji Format", "PrefixFormat"},
 		{"Wrap Server", "OpenAI API"},
 	}

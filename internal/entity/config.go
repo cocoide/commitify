@@ -11,16 +11,16 @@ import (
 type Language int
 
 const (
-	JP Language = iota
-	EN
+	EN Language = iota
+	JP
 )
 
 type CodeFormat int
 
 const (
-	EmojiFormat CodeFormat = iota
+	NormalFormat CodeFormat = iota
+	EmojiFormat
 	PrefixFormat
-	NormalFormat
 )
 
 type AISource int
@@ -31,10 +31,10 @@ const (
 )
 
 type Config struct {
-	ChatGptApiKey string `json:"chatGpt_ApiKey"`
-	UseLanguage   int    `json:"Use_Language"`
-	CommitFormat  int    `json:"Commit_Format"`
-	AISource      int    `json:"AI_Source"`
+	ChatGptApiKey string `json:"chatGptApiKey"`
+	UseLanguage   int    `json:"UseLanguage"`
+	CommitFormat  int    `json:"CommitFormat"`
+	AISource      int    `json:"AISource"`
 }
 
 func (c *Config) Config2PbVars() (pb.CodeFormatType, pb.LanguageType) {
