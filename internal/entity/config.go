@@ -62,7 +62,7 @@ func (c *Config) Config2PbVars() (pb.CodeFormatType, pb.LanguageType) {
 func ReadConfig() (Config, error) {
 	var result Config
 
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
@@ -75,7 +75,7 @@ func ReadConfig() (Config, error) {
 }
 
 func WriteConfig(config Config) error {
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	configMap := make(map[string]interface{})
