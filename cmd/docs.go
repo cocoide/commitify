@@ -4,6 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/cocoide/commitify/static"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -15,7 +17,7 @@ var docsCmd = &cobra.Command{
 	Short: "Document of commitify",
 	Run: func(cmd *cobra.Command, args []string) {
 		b, _ := static.Logo.ReadFile("logo.txt")
-		color.Cyan(string(b))
+		fmt.Print(color.CyanString(string(b)) + "\n\n ・Languageは日本語と英語が選択できます\n\n ・CodeFormatはPrefix (例: feat: A)とEmoji (例: 🐛 Bugix), Normal (例: Feat A)が選べます")
 	},
 }
 
