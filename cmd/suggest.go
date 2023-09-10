@@ -84,32 +84,28 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *model) View() string {
 	if m.errorMsg != "" {
-		red := color.New(color.FgRed).SprintFunc()
-		return fmt.Sprintf(red(m.errorMsg))
+		return color.RedString(m.errorMsg)
 	}
 	if m.isLoading {
 		return "🌎 Generating commit messages ..."
 	}
 	var b strings.Builder
 	if m.errorMsg != "" {
-		red := color.New(color.FgRed).SprintFunc()
-		b.WriteString(red(m.errorMsg) + "\n\n")
+		b.WriteString(color.RedString(m.errorMsg) + "\n\n")
 	}
 	if m.isEditing{
 		return m.textInput.View()
 	}
 
-	white := color.New(color.FgWhite).SprintFunc()
-	b.WriteString(white("🍕Please select an option:"))
-	b.WriteString(white("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
+	b.WriteString(color.WhiteString("🍕Please select an option:"))
+	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
+
 
 	for i, choice := range m.choices {
-		cyan := color.New(color.FgCyan).SprintFunc()
-		hiCyan := color.New(color.FgHiCyan).SprintFunc()
 		if i == m.currentIdx {
-			b.WriteString(fmt.Sprintf(hiCyan("➡️  %s\n"), choice))
+			b.WriteString(fmt.Sprintf(color.HiCyanString("➡️  %s\n"), choice))
 		} else {
-			b.WriteString(fmt.Sprintf(cyan("    %s\n"), choice))
+			b.WriteString(fmt.Sprintf(color.CyanString("    %s\n"), choice))
 		}
 	}
 	return b.String()

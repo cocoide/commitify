@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/cocoide/commitify/static"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -17,9 +15,7 @@ var docsCmd = &cobra.Command{
 	Short: "Document of commitify",
 	Run: func(cmd *cobra.Command, args []string) {
 		b, _ := static.Logo.ReadFile("logo.txt")
-		cyan := color.New(color.FgCyan).SprintFunc()
-		logo := cyan(string(b))
-		fmt.Println(logo)
+		color.Cyan(string(b))
 	},
 }
 
