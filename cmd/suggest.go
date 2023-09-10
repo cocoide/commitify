@@ -17,14 +17,13 @@ import (
 )
 
 type model struct {
-	choices      []string
-	currentIdx   int
-	errorMsg     string
-	isLoading    bool
-	animationIdx int
-	isEditing    bool
-	spinner      spinner.Model
-	textInput    textinput.Model
+	choices    []string
+	currentIdx int
+	errorMsg   string
+	isLoading  bool
+	isEditing  bool
+	spinner    spinner.Model
+	textInput  textinput.Model
 }
 
 func (m *model) Init() tea.Cmd {
@@ -41,13 +40,16 @@ func (m *model) Init() tea.Cmd {
 		gi = gateway.NewGrpcServeGateway()
 	}
 
-	messages, err := gi.FetchCommitMessages()
-	if err != nil {
-		log.Fatal("コミットメッセージの生成に失敗: ", err)
-		os.Exit(-1)
-	}
-	m.choices = messages
-	m.isLoading = false
+	go func() {
+		messages, err := gi.FetchCommitMessages()
+		if err != nil {
+			log.Fatal("コミットメッセージの生成に失敗: ", err)
+			os.Exit(-1)
+		}
+		m.choices = messages
+		m.isLoading = false
+	}()
+
 	return textinput.Blink
 }
 
@@ -86,7 +88,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spinner, cmd = m.spinner.Update(msg)
 		return m, cmd
 	}
-	return m, nil
+	return m, m.spinner.Tick
 }
 
 func (m *model) resetSpinner() {
