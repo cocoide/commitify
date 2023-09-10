@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/util"
 	"github.com/fatih/color"
@@ -21,17 +22,20 @@ type model struct {
 }
 
 func (m *model) Init() tea.Cmd {
-	// 本当はこう書きたい。今は一旦全てgrpcサーバに呼び出し
-	// switch conf.endpoint {
-	// case openai:
-	// 	~~~
-	// case grpc_serve:
-	// 	~~~
-	// }
-	// var gateway gatewayInterface
+	conf, err := entity.ReadConfig()
+	if err != nil {
+		log.Fatal("設定情報の取得に失敗: ", err)
+	}
 
-	gsg := gateway.NewGrpcServeGateway()
-	messages, err := gsg.FetchCommitMessages()
+	var gi gateway.GatewayInterface
+	switch conf.AISource {
+	case int(entity.WrapServer):
+		gi = gateway.NewGrpcServeGateway()
+	default:
+		gi = gateway.NewGrpcServeGateway()
+	}
+
+	messages, err := gi.FetchCommitMessages()
 	if err != nil {
 		log.Fatal("コミットメッセージの生成に失敗: ", err)
 		os.Exit(-1)
