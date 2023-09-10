@@ -9,9 +9,14 @@ import (
 
 func main() {
 	// configファイルがあるかどうかを確認
-	_, err := os.Stat("config.yaml")
+	homePath := os.Getenv("HOME")
+
+	_, err := os.Stat(homePath + "/.commitify/config.yaml")
 	if os.IsNotExist(err) {
-		if _, err := os.Create("config.yaml"); err != nil {
+		if err := os.MkdirAll(homePath+"/.commitify", 0755); err != nil {
+			fmt.Printf("error of make directory, %v", err)
+		}
+		if _, err := os.Create(homePath + "/.commitify/config.yaml"); err != nil {
 			fmt.Printf("error creating config file, %s", err.Error())
 		}
 	}
