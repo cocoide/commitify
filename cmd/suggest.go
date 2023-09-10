@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
@@ -19,6 +20,8 @@ type model struct {
 	currentIdx int
 	errorMsg   string
 	isLoading  bool
+	isEditing bool
+	textInput textinput.Model
 }
 
 func (m *model) Init() tea.Cmd {
@@ -42,14 +45,22 @@ func (m *model) Init() tea.Cmd {
 	}
 	m.choices = messages
 	m.isLoading = false
-
-	return nil
+	return textinput.Blink
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	m.textInput, cmd = m.textInput.Update(msg)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
+		case tea.KeyTab:
+			m.isEditing = true
+			m.textInput.Focus()
+			m.textInput.SetValue(m.choices[m.currentIdx])
+			m.textInput.CharLimit = 100
+			m.textInput.Width = 100
+			return m, cmd
 		case tea.KeyUp:
 			if m.currentIdx > 0 {
 				m.currentIdx--
@@ -84,6 +95,10 @@ func (m *model) View() string {
 		red := color.New(color.FgRed).SprintFunc()
 		b.WriteString(red(m.errorMsg) + "\n\n")
 	}
+	if m.isEditing{
+		return m.textInput.View()
+	}
+
 	white := color.New(color.FgWhite).SprintFunc()
 	b.WriteString(white("🍕Please select an option:"))
 	b.WriteString(white("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
@@ -100,12 +115,27 @@ func (m *model) View() string {
 	return b.String()
 }
 
+func initialModel() model {
+	ti := textinput.New()
+	ti.Focus()
+
+	return model{
+		choices :[]string{""},
+		currentIdx :0,
+		errorMsg  :"",
+		isLoading:  true,
+		isEditing: false,
+		textInput: ti,
+	}
+}
+
+
 var suggestCmd = &cobra.Command{
 	Use:     "suggest",
 	Short:   "Suggestion of commit message for staging repository",
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
-		m := model{isLoading: true}
+		m := initialModel()
 		p := tea.NewProgram(&m)
 		p.Run()
 	},
