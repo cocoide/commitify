@@ -6,8 +6,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/util"
@@ -15,13 +17,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Render
+	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
+	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+)
+
 type model struct {
 	choices    []string
 	currentIdx int
 	errorMsg   string
 	isLoading  bool
-	isEditing bool
-	textInput textinput.Model
+	isEditing  bool
+	spinner    spinner.Model
+	textInput  textinput.Model
 }
 
 func (m *model) Init() tea.Cmd {
@@ -38,13 +47,16 @@ func (m *model) Init() tea.Cmd {
 		gi = gateway.NewGrpcServeGateway()
 	}
 
-	messages, err := gi.FetchCommitMessages()
-	if err != nil {
-		log.Fatal("コミットメッセージの生成に失敗: ", err)
-		os.Exit(-1)
-	}
-	m.choices = messages
-	m.isLoading = false
+	go func() {
+		messages, err := gi.FetchCommitMessages()
+		if err != nil {
+			log.Fatal("コミットメッセージの生成に失敗: ", err)
+			os.Exit(-1)
+		}
+		m.choices = messages
+		m.isLoading = false
+	}()
+
 	return textinput.Blink
 }
 
@@ -78,8 +90,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		}
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	}
-	return m, nil
+	return m, m.spinner.Tick
+}
+
+func (m *model) resetSpinner() {
+	m.spinner = spinner.New()
+	m.spinner.Style = spinnerStyle
+	m.spinner.Spinner = spinner.Globe
 }
 
 func (m *model) View() string {
@@ -87,19 +109,19 @@ func (m *model) View() string {
 		return color.RedString(m.errorMsg)
 	}
 	if m.isLoading {
-		return "🌎 Generating commit messages ..."
+		s := fmt.Sprintf("\n %s %s\n\n", m.spinner.View(), textStyle("Generating commit messages..."))
+		return s
 	}
 	var b strings.Builder
 	if m.errorMsg != "" {
 		b.WriteString(color.RedString(m.errorMsg) + "\n\n")
 	}
-	if m.isEditing{
+	if m.isEditing {
 		return m.textInput.View()
 	}
 
 	b.WriteString(color.WhiteString("🍕Please select an option:"))
 	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
-
 
 	for i, choice := range m.choices {
 		if i == m.currentIdx {
@@ -116,15 +138,14 @@ func initialModel() model {
 	ti.Focus()
 
 	return model{
-		choices :[]string{""},
-		currentIdx :0,
-		errorMsg  :"",
+		choices:    []string{""},
+		currentIdx: 0,
+		errorMsg:   "",
 		isLoading:  true,
-		isEditing: false,
-		textInput: ti,
+		isEditing:  false,
+		textInput:  ti,
 	}
 }
-
 
 var suggestCmd = &cobra.Command{
 	Use:     "suggest",
@@ -132,6 +153,7 @@ var suggestCmd = &cobra.Command{
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
 		m := initialModel()
+		m.resetSpinner()
 		p := tea.NewProgram(&m)
 		p.Run()
 	},

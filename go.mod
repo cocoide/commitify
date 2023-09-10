@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.24.2
+	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/fatih/color v1.15.0
 	github.com/golang/mock v1.4.4
 	github.com/sashabaranov/go-openai v1.15.1
