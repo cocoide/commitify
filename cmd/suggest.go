@@ -1,14 +1,16 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
-	"github.com/cocoide/commitify/internal/service"
 	"github.com/cocoide/commitify/util"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -20,42 +22,48 @@ type model struct {
 	errorMsg     string
 	isLoading    bool
 	animationIdx int
-	messages     []string
-	spinner spinner.Model
+	isEditing    bool
+	spinner      spinner.Model
+	textInput    textinput.Model
 }
 
-type generateMessages struct {
-	messages []string
-	errorMsg string
-}
-
-func (m model) Init() tea.Cmd {
-	return func() tea.Msg {
-		ctx := context.Background()
-		og := gateway.NewOpenAIGateway(ctx)
-		ms := service.NewMessageService(og)
-		stagingCode := util.ExecGetStagingCode()
-		messages, err := ms.GenerateCommitMessage(stagingCode)
-		if err != nil {
-			return generateMessages{errorMsg: "メッセージの生成に失敗: " + err.Error()}
-		}
-		return generateMessages{messages: messages}
+func (m *model) Init() tea.Cmd {
+	conf, err := entity.ReadConfig()
+	if err != nil {
+		log.Fatal("設定情報の取得に失敗: ", err)
 	}
+
+	var gi gateway.GatewayInterface
+	switch conf.AISource {
+	case int(entity.WrapServer):
+		gi = gateway.NewGrpcServeGateway()
+	default:
+		gi = gateway.NewGrpcServeGateway()
+	}
+
+	messages, err := gi.FetchCommitMessages()
+	if err != nil {
+		log.Fatal("コミットメッセージの生成に失敗: ", err)
+		os.Exit(-1)
+	}
+	m.choices = messages
+	m.isLoading = false
+	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	m.textInput, cmd = m.textInput.Update(msg)
 	switch msg := msg.(type) {
-	case generateMessages:
-		if msg.errorMsg != "" {
-			m.errorMsg = msg.errorMsg
-			m.isLoading = false
-			return m, nil
-		}
-		m.choices = msg.messages
-		m.isLoading = false
-		return m, nil
 	case tea.KeyMsg:
 		switch msg.Type {
+		case tea.KeyTab:
+			m.isEditing = true
+			m.textInput.Focus()
+			m.textInput.SetValue(m.choices[m.currentIdx])
+			m.textInput.CharLimit = 100
+			m.textInput.Width = 100
+			return m, cmd
 		case tea.KeyUp:
 			if m.currentIdx > 0 {
 				m.currentIdx--
@@ -87,7 +95,7 @@ func (m *model) resetSpinner() {
 	m.spinner.Spinner = spinner.Globe
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	if m.errorMsg != "" {
 		return color.RedString(m.errorMsg)
 	}
@@ -99,6 +107,10 @@ func (m model) View() string {
 	if m.errorMsg != "" {
 		b.WriteString(color.RedString(m.errorMsg) + "\n\n")
 	}
+	if m.isEditing {
+		return m.textInput.View()
+	}
+
 	b.WriteString(color.WhiteString("🍕Please select an option:"))
 	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
 
@@ -112,14 +124,28 @@ func (m model) View() string {
 	return b.String()
 }
 
+func initialModel() model {
+	ti := textinput.New()
+	ti.Focus()
+
+	return model{
+		choices:    []string{""},
+		currentIdx: 0,
+		errorMsg:   "",
+		isLoading:  true,
+		isEditing:  false,
+		textInput:  ti,
+	}
+}
+
 var suggestCmd = &cobra.Command{
 	Use:     "suggest",
 	Short:   "Suggestion of commit message for staging repository",
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
-		m := model{isLoading: true}
+		m := initialModel()
 		m.resetSpinner()
-		p := tea.NewProgram(m)
+		p := tea.NewProgram(&m)
 		p.Run()
 	},
 }

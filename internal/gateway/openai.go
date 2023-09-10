@@ -4,11 +4,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/cocoide/commitify/util"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/sashabaranov/go-openai"
 )
 
-//go:generate mockgen -source=openai.go -destination=../../mock/openai.go
 type OpenAIGateway interface {
 	GetAnswerFromPrompt(prompt string, variability float32) (string, error)
 	AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string
@@ -20,7 +19,7 @@ type openAIGateway struct {
 }
 
 func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
-	config, err := util.ReadConfig()
+	config, err := entity.ReadConfig()
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
