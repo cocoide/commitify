@@ -109,7 +109,7 @@ func (m *model) View() string {
 		return color.RedString(m.errorMsg)
 	}
 	if m.isLoading {
-		s := fmt.Sprintf("\n %s %s\n\n", m.spinner.View(), textStyle("Generating commit messages..."))
+		s := fmt.Sprintf("\n %s %s\n\n", m.spinner.View(), textStyle("コミットメッセージ生成中"))
 		return s
 	}
 	var b strings.Builder
@@ -120,8 +120,9 @@ func (m *model) View() string {
 		return m.textInput.View()
 	}
 
-	b.WriteString(color.WhiteString("🍕Please select an option:"))
-	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select.\n\n"))
+	b.WriteString(color.WhiteString("🍕 Please select and enter to commit"))
+	b.WriteString(color.WhiteString("\n  Use arrow ↑↓ to navigate and press Enter to select."))
+	b.WriteString(color.WhiteString("\n  ( enter Tab key to edit message )\n\n"))
 
 	for i, choice := range m.choices {
 		if i == m.currentIdx {

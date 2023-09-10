@@ -9,6 +9,8 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "commitify",
 	Short: "CLI for thinking commit message",
+	Long: `By "commitify config" command, you can change commit message format or language, 
+	( To know details about format or language, enter commitify docs )`,
 }
 
 func Execute() {
