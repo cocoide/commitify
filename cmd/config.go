@@ -6,17 +6,24 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/cocoide/commitify/util"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 var (
-	configKey    = [...]string{"api-key", "language", "format"}
-	configOption = [][]string{
+	configKey    = [...]string{"api-key", "language", "format", "ai-source"}
+	configOption = [][]int{
 		{},
-		{"Japanese", "English"},
-		{"Format 1", "Format 2"},
+		{int(entity.EN), int(entity.JP)},
+		{int(entity.NormalFormat), int(entity.EmojiFormat), int(entity.PrefixFormat)},
+		{int(entity.WrapServer), int(entity.OpenAiAPI)},
+	}
+	configOptionLabel = [][]string{
+		{},
+		{"English", "Japanese"},
+		{"Normal Format", "Emoji Format", "PrefixFormat"},
+		{"Wrap Server", "OpenAI API"},
 	}
 )
 
@@ -175,7 +182,7 @@ func init() {
 }
 
 func saveConfig(cm configModel) {
-	currentConfig, err := util.ReadConfig()
+	currentConfig, err := entity.ReadConfig()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -187,9 +194,11 @@ func saveConfig(cm configModel) {
 		currentConfig.UseLanguage = configOption[cm.configKeyIndex][cm.configOptionIndex]
 	case 2:
 		currentConfig.CommitFormat = configOption[cm.configKeyIndex][cm.configOptionIndex]
+	case 3:
+		currentConfig.AISource = configOption[cm.configKeyIndex][cm.configOptionIndex]
 	}
 
-	err = util.WriteConfig(currentConfig)
+	err = entity.WriteConfig(currentConfig)
 	if err != nil {
 		fmt.Println(err)
 	}
