@@ -77,10 +77,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.currentIdx > 0 {
 				m.currentIdx--
 			}
-		case tea.KeyLeft:
-			if m.currentIdx > 0 {
-				m.currentIdx--
-			}
 		case tea.KeyDown:
 			if m.currentIdx < len(m.choices)-1 {
 				m.currentIdx++
