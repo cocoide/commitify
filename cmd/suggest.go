@@ -10,11 +10,11 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/cocoide/commitify/internal/entity"
-	"github.com/cocoide/commitify/internal/gateway"
-	"github.com/cocoide/commitify/util"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+
+	"github.com/cocoide/commitify/internal/service"
+	"github.com/cocoide/commitify/util"
 )
 
 var (
@@ -30,24 +30,12 @@ type suggestModel struct {
 	isEditing  bool
 	spinner    spinner.Model
 	textInput  textinput.Model
+	scs        *service.SuggestCmdService
 }
 
 func (sm *suggestModel) Init() tea.Cmd {
-	conf, err := entity.ReadConfig()
-	if err != nil {
-		log.Fatal("設定情報の取得に失敗: ", err)
-	}
-
-	var gi gateway.GatewayInterface
-	switch conf.AISource {
-	case int(entity.WrapServer):
-		gi = gateway.NewGrpcServeGateway()
-	default:
-		gi = gateway.NewGrpcServeGateway()
-	}
-
 	go func() {
-		messages, err := gi.FetchCommitMessages()
+		messages, err := sm.scs.GenerateCommitMessages()
 		if err != nil {
 			log.Fatal("コミットメッセージの生成に失敗: ", err)
 			os.Exit(-1)
@@ -97,12 +85,6 @@ func (sm *suggestModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return sm, sm.spinner.Tick
 }
 
-func (sm *suggestModel) resetSpinner() {
-	sm.spinner = spinner.New()
-	sm.spinner.Style = spinnerStyle
-	sm.spinner.Spinner = spinner.Globe
-}
-
 func (sm *suggestModel) View() string {
 	if sm.errorMsg != "" {
 		return color.RedString(sm.errorMsg)
@@ -133,18 +115,34 @@ func (sm *suggestModel) View() string {
 	return b.String()
 }
 
-func initialModel() suggestModel {
+// モデルの初期化処理
+func NewSuggestModel() *suggestModel {
 	ti := textinput.New()
 	ti.Focus()
 
-	return model{
+	// suggestコマンドのサービスの取得
+	scs, err := service.NewSuggestCmdService()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(-1)
+	}
+
+	return &suggestModel{
 		choices:    []string{""},
 		currentIdx: 0,
 		errorMsg:   "",
 		isLoading:  true,
 		isEditing:  false,
 		textInput:  ti,
+		scs:        scs,
 	}
+}
+
+// スピナーの初期化
+func (sm *suggestModel) initSpinner() {
+	sm.spinner = spinner.New()
+	sm.spinner.Style = spinnerStyle
+	sm.spinner.Spinner = spinner.Globe
 }
 
 var suggestCmd = &cobra.Command{
@@ -152,9 +150,9 @@ var suggestCmd = &cobra.Command{
 	Short:   "Suggestion of commit message for staging repository",
 	Aliases: []string{"s", "suggest"},
 	Run: func(cmd *cobra.Command, args []string) {
-		sm := initialModel()
-		sm.resetSpinner()
-		p := tea.NewProgram(&sm)
+		sm := NewSuggestModel()
+		sm.initSpinner()
+		p := tea.NewProgram(sm)
 		p.Run()
 	},
 }

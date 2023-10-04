@@ -5,12 +5,12 @@ import "os/exec"
 type fileDiffService struct {
 }
 
-func NewFileDiffService() *fileDiffService {
-	ps := new(fileDiffService)
-	return ps
+func NewFileDiffService() fileDiffService {
+	fds := fileDiffService{}
+	return fds
 }
 
-func (ps fileDiffService) CreateFileDiffStr() (string, error) {
+func (fds *fileDiffService) createFileDiffStr() (string, error) {
 	diff, err := exec.Command("git", "diff", "--staged").Output()
 
 	return string(diff), err
