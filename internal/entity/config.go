@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// コミットメッセージの言語の列挙型
 type Language int
 
 const (
@@ -16,6 +17,7 @@ const (
 	JP
 )
 
+// コミットメッセージの形式の列挙型
 type CodeFormat int
 
 const (
@@ -24,6 +26,7 @@ const (
 	PrefixFormat
 )
 
+// AIのソースの列挙型
 type AISource int
 
 const (
