@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cocoide/commitify/internal/service"
-	"github.com/cocoide/commitify/util"
 )
 
 var (
@@ -69,7 +68,7 @@ func (sm *suggestModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				sm.currentIdx++
 			}
 		case tea.KeyEnter:
-			if err := util.ExecCommitMessage(sm.choices[sm.currentIdx]); err != nil {
+			if err := sm.scs.SubmitCommit(sm.choices[sm.currentIdx]); err != nil {
 				sm.errorMsg = "コミットに失敗: " + err.Error()
 				return sm, tea.Quit
 			}

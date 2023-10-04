@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"os/exec"
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
@@ -41,4 +42,12 @@ func (scs *SuggestCmdService) GenerateCommitMessages() ([]string, error) {
 	}
 
 	return scs.ais.FetchCommitMessages(fileDiffStr)
+}
+
+func (scs *SuggestCmdService) SubmitCommit(commitMessage string) error {
+	cmd := exec.Command("git", "commit", "-m", commitMessage)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
