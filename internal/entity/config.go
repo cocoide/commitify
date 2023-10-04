@@ -95,3 +95,28 @@ func WriteConfig(config Config) error {
 	}
 	return nil
 }
+
+func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr string) error {
+	currentConfig, err := ReadConfig()
+	if err != nil {
+		return err
+	}
+
+	switch configIndex {
+	case 0:
+		currentConfig.ChatGptApiKey = updateConfigParamStr
+	case 1:
+		currentConfig.UseLanguage = updateConfigParamInt
+	case 2:
+		currentConfig.CommitFormat = updateConfigParamInt
+	case 3:
+		currentConfig.AISource = updateConfigParamInt
+	}
+
+	err = WriteConfig(currentConfig)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
