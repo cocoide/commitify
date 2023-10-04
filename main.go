@@ -9,9 +9,13 @@ import (
 
 func main() {
 	// configファイルがあるかどうかを確認
-	homePath := os.Getenv("HOME")
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("error of find user home dir, %v", err)
+		return
+	}
 
-	_, err := os.Stat(homePath + "/.commitify/config.yaml")
+	_, err = os.Stat(homePath + "/.commitify/config.yaml")
 	if os.IsNotExist(err) {
 		if err := os.MkdirAll(homePath+"/.commitify", 0755); err != nil {
 			fmt.Printf("error of make directory, %v", err)

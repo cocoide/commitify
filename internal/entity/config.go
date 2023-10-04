@@ -3,6 +3,7 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	pb "github.com/cocoide/commitify/pkg/grpc"
 	"github.com/spf13/viper"
@@ -61,8 +62,12 @@ func (c *Config) Config2PbVars() (pb.CodeFormatType, pb.LanguageType) {
 
 func ReadConfig() (Config, error) {
 	var result Config
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return result, err
+	}
 
-	viper.AddConfigPath("$HOME/.commitify")
+	viper.AddConfigPath(homePath + "/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
@@ -75,7 +80,12 @@ func ReadConfig() (Config, error) {
 }
 
 func WriteConfig(config Config) error {
-	viper.AddConfigPath("$HOME/.commitify")
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	viper.AddConfigPath(homePath + "/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	configMap := make(map[string]interface{})
