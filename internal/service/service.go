@@ -11,3 +11,7 @@ type CommitMessageService interface {
 type GithubService interface {
 	GetStaginCodeDiff() (string, error)
 }
+
+type NLPService interface {
+	GetAnswerFromPrompt(prompt string) (string, error)
+}

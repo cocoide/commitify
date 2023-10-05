@@ -3,7 +3,6 @@ package usecase
 import (
 	"fmt"
 	"github.com/cocoide/commitify/internal/service"
-	"log"
 	"os/exec"
 
 	"github.com/cocoide/commitify/internal/entity"
@@ -15,13 +14,6 @@ type SuggestCmdUsecase struct {
 }
 
 func NewSuggestCmdUsecase(message service.CommitMessageService, github service.GithubService) *SuggestCmdUsecase {
-	conf, err := entity.ReadConfig()
-	if err != nil {
-		log.Fatalf("設定の読み込みに失敗")
-	}
-	if conf.WithGptRequestLocation() == entity.Local {
-		log.Fatalf("現在、非対応の機能です。")
-	}
 	return &SuggestCmdUsecase{message: message, github: github}
 }
 

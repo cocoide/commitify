@@ -2,8 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
+	"github.com/cocoide/commitify/internal/service"
 	"github.com/cocoide/commitify/internal/usecase"
+	"golang.org/x/net/context"
 	"log"
 	"os"
 	"strings"
@@ -121,8 +124,19 @@ func NewSuggestModel() *suggestModel {
 
 	// suggestコマンドのサービスの取得
 	inputOutput := gateway.NewInputOutputGateway()
-	grpcServer := gateway.NewGrpcServerGateway()
-	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(grpcServer, inputOutput)
+	var commitMessageService service.CommitMessageService
+	config, err := entity.ReadConfig()
+	if err != nil {
+		log.Fatalf("設定ファイルの読み込みができませんでした")
+	}
+	nlp := gateway.NewOpenAIGateway(context.Background())
+	switch config.WithGptRequestLocation() {
+	case entity.Local:
+		commitMessageService = gateway.NewLocalMessageService(nlp)
+	case entity.Server:
+		commitMessageService = gateway.NewGrpcServerGateway()
+	}
+	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(commitMessageService, inputOutput)
 
 	return &suggestModel{
 		choices:    []string{""},
