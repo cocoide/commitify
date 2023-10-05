@@ -3,10 +3,9 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-
-	pb "github.com/cocoide/commitify/pkg/grpc"
+	"github.com/cocoide/commitify-grpc-server/pkg/pb"
 	"github.com/spf13/viper"
+	"os"
 )
 
 // コミットメッセージの言語の列挙型
@@ -26,12 +25,12 @@ const (
 	PrefixFormat
 )
 
-// AIのソースの列挙型
-type AISource int
+// ChatGPTのAPIを叩く場所
+type GptRequestLocation int
 
 const (
-	WrapServer AISource = iota
-	OpenAiAPI
+	Server GptRequestLocation = iota
+	Local
 )
 
 type Config struct {
@@ -132,4 +131,15 @@ func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr stri
 	}
 
 	return nil
+}
+
+func (c *Config) WithGptRequestLocation() GptRequestLocation {
+	switch c.AISource {
+	case 0:
+		return Server
+	case 1:
+		return Local
+	default:
+		return Server
+	}
 }

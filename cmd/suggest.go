@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/cocoide/commitify/internal/gateway"
+	"github.com/cocoide/commitify/internal/usecase"
 	"log"
 	"os"
 	"strings"
@@ -12,8 +14,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-
-	"github.com/cocoide/commitify/internal/service"
 )
 
 var (
@@ -29,7 +29,7 @@ type suggestModel struct {
 	isEditing  bool
 	spinner    spinner.Model
 	textInput  textinput.Model
-	scs        *service.SuggestCmdService
+	scs        *usecase.SuggestCmdUsecase
 }
 
 func (sm *suggestModel) Init() tea.Cmd {
@@ -120,11 +120,9 @@ func NewSuggestModel() *suggestModel {
 	ti.Focus()
 
 	// suggestコマンドのサービスの取得
-	scs, err := service.NewSuggestCmdService()
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(-1)
-	}
+	inputOutput := gateway.NewInputOutputGateway()
+	grpcServer := gateway.NewGrpcServerGateway()
+	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(grpcServer, inputOutput)
 
 	return &suggestModel{
 		choices:    []string{""},
@@ -133,7 +131,7 @@ func NewSuggestModel() *suggestModel {
 		isLoading:  true,
 		isEditing:  false,
 		textInput:  ti,
-		scs:        scs,
+		scs:        suggestCmdUsecase,
 	}
 }
 
