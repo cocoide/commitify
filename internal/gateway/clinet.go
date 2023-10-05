@@ -14,15 +14,15 @@ const (
 
 var CommitMessageRegex = regexp.MustCompile(`^(\d.\s+)|^(-\s+)|^(\s+)`)
 
-type localMessageService struct {
+type clientCommitMessageGateway struct {
 	nlp service.NLPService
 }
 
-func NewLocalMessageService(nlp service.NLPService) service.CommitMessageService {
-	return &localMessageService{nlp: nlp}
+func NewClientCommitMessageGateway(nlp service.NLPService) service.CommitMessageService {
+	return &clientCommitMessageGateway{nlp: nlp}
 }
 
-func (l *localMessageService) GenerateCommitMessageList(code string, conf entity.Config) ([]string, error) {
+func (l *clientCommitMessageGateway) GenerateCommitMessageList(code string, conf entity.Config) ([]string, error) {
 	prompt := fmt.Sprintf(NormalMessagePrompt, code)
 	result, err := l.nlp.GetAnswerFromPrompt(prompt)
 	if err != nil {
@@ -33,7 +33,7 @@ func (l *localMessageService) GenerateCommitMessageList(code string, conf entity
 	return messages, nil
 }
 
-func (l *localMessageService) removeFromArrayByRegex(array []string, pattern *regexp.Regexp) []string {
+func (l *clientCommitMessageGateway) removeFromArrayByRegex(array []string, pattern *regexp.Regexp) []string {
 	for i, msg := range array {
 		array[i] = pattern.ReplaceAllString(msg, "")
 	}

@@ -30,7 +30,7 @@ type GptRequestLocation int
 
 const (
 	Server GptRequestLocation = iota
-	Local
+	Client
 )
 
 type Config struct {
@@ -138,7 +138,7 @@ func (c *Config) WithGptRequestLocation() GptRequestLocation {
 	case 0:
 		return Server
 	case 1:
-		return Local
+		return Client
 	default:
 		return Server
 	}
