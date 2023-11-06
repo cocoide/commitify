@@ -2,23 +2,19 @@ package gateway
 
 import (
 	"context"
+	"github.com/cocoide/commitify/internal/service"
 	"log"
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/sashabaranov/go-openai"
 )
 
-type OpenAIGateway interface {
-	GetAnswerFromPrompt(prompt string, variability float32) (string, error)
-	AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string
-}
-
 type openAIGateway struct {
 	client *openai.Client
 	ctx    context.Context
 }
 
-func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
+func NewOpenAIGateway(ctx context.Context) service.NLPService {
 	config, err := entity.ReadConfig()
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
@@ -27,7 +23,7 @@ func NewOpenAIGateway(ctx context.Context) OpenAIGateway {
 	return &openAIGateway{client: client, ctx: ctx}
 }
 
-func (og *openAIGateway) GetAnswerFromPrompt(prompt string, variability float32) (string, error) {
+func (og *openAIGateway) GetAnswerFromPrompt(prompt string) (string, error) {
 	req := openai.ChatCompletionRequest{
 		Model: openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
@@ -36,7 +32,7 @@ func (og *openAIGateway) GetAnswerFromPrompt(prompt string, variability float32)
 				Content: prompt,
 			},
 		},
-		Temperature: variability,
+		Temperature: 0.001,
 	}
 	res, err := og.client.CreateChatCompletion(og.ctx, req)
 	if err != nil {
@@ -44,15 +40,4 @@ func (og *openAIGateway) GetAnswerFromPrompt(prompt string, variability float32)
 	}
 	answer := res.Choices[0].Message.Content
 	return answer, nil
-}
-
-func (og *openAIGateway) AsyncGetAnswerFromPrompt(prompt string, variability float32) <-chan string {
-	responseCh := make(chan string, 1)
-
-	go func() {
-		answer, _ := og.GetAnswerFromPrompt(prompt, variability)
-		responseCh <- answer
-	}()
-
-	return responseCh
 }

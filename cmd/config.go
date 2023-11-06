@@ -18,7 +18,7 @@ var (
 		{},
 		{int(entity.EN), int(entity.JP)},
 		{int(entity.NormalFormat), int(entity.EmojiFormat), int(entity.PrefixFormat)},
-		{int(entity.WrapServer), int(entity.OpenAiAPI)},
+		{int(entity.Server), int(entity.Local)},
 	}
 	configOptionLabel = [][]string{
 		{},
