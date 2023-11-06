@@ -2,6 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/cocoide/commitify/internal/entity"
+	"github.com/cocoide/commitify/internal/gateway"
+	"github.com/cocoide/commitify/internal/service"
+	"github.com/cocoide/commitify/internal/usecase"
+	"golang.org/x/net/context"
 	"log"
 	"os"
 	"strings"
@@ -12,8 +17,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-
-	"github.com/cocoide/commitify/internal/service"
 )
 
 var (
@@ -29,7 +32,7 @@ type suggestModel struct {
 	isEditing  bool
 	spinner    spinner.Model
 	textInput  textinput.Model
-	scs        *service.SuggestCmdService
+	scs        *usecase.SuggestCmdUsecase
 }
 
 func (sm *suggestModel) Init() tea.Cmd {
@@ -120,11 +123,20 @@ func NewSuggestModel() *suggestModel {
 	ti.Focus()
 
 	// suggestコマンドのサービスの取得
-	scs, err := service.NewSuggestCmdService()
+	inputOutput := gateway.NewInputOutputGateway()
+	var commitMessageService service.CommitMessageService
+	config, err := entity.ReadConfig()
 	if err != nil {
-		log.Fatal(err)
-		os.Exit(-1)
+		log.Fatalf("設定ファイルの読み込みができませんでした")
 	}
+	switch config.WithGptRequestLocation() {
+	case entity.Client:
+		nlp := gateway.NewOpenAIGateway(context.Background())
+		commitMessageService = gateway.NewClientCommitMessageGateway(nlp)
+	case entity.Server:
+		commitMessageService = gateway.NewGrpcServerGateway()
+	}
+	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(commitMessageService, inputOutput)
 
 	return &suggestModel{
 		choices:    []string{""},
@@ -133,7 +145,7 @@ func NewSuggestModel() *suggestModel {
 		isLoading:  true,
 		isEditing:  false,
 		textInput:  ti,
-		scs:        scs,
+		scs:        suggestCmdUsecase,
 	}
 }
 
