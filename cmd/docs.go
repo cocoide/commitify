@@ -17,7 +17,9 @@ var docsCmd = &cobra.Command{
 	Short: "Document of commitify",
 	Run: func(cmd *cobra.Command, args []string) {
 		b, _ := static.Logo.ReadFile("logo.txt")
-		fmt.Print(color.CyanString(string(b)) + "\n\n ・Languageは日本語と英語が選択できます\n\n ・CodeFormatはPrefix (例: feat: A)とEmoji (例: 🐛 Bugix), Normal (例: Feat A)が選べます")
+		fmt.Println(color.CyanString(string(b)))
+		fmt.Println("\n ・Languageは日本語と英語が選択できます")
+		fmt.Println(" ・CodeFormatはPrefix (例: feat: A)とEmoji (例: 🐛 Bugix), Normal (例: Feat A)が選べます")
 	},
 }
 

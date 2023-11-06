@@ -6,9 +6,10 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/cocoide/commitify/internal/entity"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+
+	"github.com/cocoide/commitify/internal/entity"
 )
 
 var (
@@ -27,7 +28,7 @@ var (
 	}
 )
 
-type configModel struct {
+type configCmdModel struct {
 	configKeyIndex    int
 	configOptionIndex int
 	configKeySelected bool
@@ -35,21 +36,21 @@ type configModel struct {
 	textInput         textinput.Model
 }
 
-func initConfigModel() configModel {
+func initConfigModel() configCmdModel {
 	ti := textinput.New()
 	ti.Focus()
 
-	return configModel{
+	return configCmdModel{
 		textInput: ti,
 		err:       nil,
 	}
 }
 
-func (cm configModel) Init() tea.Cmd {
+func (cm configCmdModel) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (cm configModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (cm configCmdModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch cm.configKeySelected {
 	// 設定項目を選択する
 	case false:
@@ -82,7 +83,7 @@ func (cm configModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tea.KeyMsg:
 				switch msg.Type {
 				case tea.KeyEnter:
-					saveConfig(cm)
+					entity.SaveConfig(cm.configKeyIndex, -1, cm.textInput.Value())
 					return cm, tea.Quit
 				case tea.KeyCtrlC, tea.KeyEsc:
 					return cm, tea.Quit
@@ -109,7 +110,7 @@ func (cm configModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						cm.configOptionIndex++
 					}
 				case tea.KeyEnter:
-					saveConfig(cm)
+					entity.SaveConfig(cm.configKeyIndex, configOption[cm.configKeyIndex][cm.configOptionIndex], "")
 					return cm, tea.Quit
 				case tea.KeyCtrlC, tea.KeyEsc:
 					return cm, tea.Quit
@@ -121,7 +122,7 @@ func (cm configModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return cm, nil
 }
 
-func (cm configModel) View() string {
+func (cm configCmdModel) View() string {
 	var b strings.Builder
 
 	switch cm.configKeySelected {
@@ -179,27 +180,4 @@ var configCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(configCmd)
-}
-
-func saveConfig(cm configModel) {
-	currentConfig, err := entity.ReadConfig()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	switch cm.configKeyIndex {
-	case 0:
-		currentConfig.ChatGptApiKey = cm.textInput.Value()
-	case 1:
-		currentConfig.UseLanguage = configOption[cm.configKeyIndex][cm.configOptionIndex]
-	case 2:
-		currentConfig.CommitFormat = configOption[cm.configKeyIndex][cm.configOptionIndex]
-	case 3:
-		currentConfig.AISource = configOption[cm.configKeyIndex][cm.configOptionIndex]
-	}
-
-	err = entity.WriteConfig(currentConfig)
-	if err != nil {
-		fmt.Println(err)
-	}
 }

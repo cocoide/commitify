@@ -3,11 +3,13 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	pb "github.com/cocoide/commitify/pkg/grpc"
 	"github.com/spf13/viper"
 )
 
+// コミットメッセージの言語の列挙型
 type Language int
 
 const (
@@ -15,6 +17,7 @@ const (
 	JP
 )
 
+// コミットメッセージの形式の列挙型
 type CodeFormat int
 
 const (
@@ -23,6 +26,7 @@ const (
 	PrefixFormat
 )
 
+// AIのソースの列挙型
 type AISource int
 
 const (
@@ -61,8 +65,12 @@ func (c *Config) Config2PbVars() (pb.CodeFormatType, pb.LanguageType) {
 
 func ReadConfig() (Config, error) {
 	var result Config
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return result, err
+	}
 
-	viper.AddConfigPath("$HOME/.commitify")
+	viper.AddConfigPath(homePath + "/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
@@ -75,7 +83,12 @@ func ReadConfig() (Config, error) {
 }
 
 func WriteConfig(config Config) error {
-	viper.AddConfigPath("$HOME/.commitify")
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	viper.AddConfigPath(homePath + "/.commitify")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	configMap := make(map[string]interface{})
@@ -93,5 +106,30 @@ func WriteConfig(config Config) error {
 	if err := viper.WriteConfig(); err != nil {
 		return fmt.Errorf("error saving config file, %s", err.Error())
 	}
+	return nil
+}
+
+func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr string) error {
+	currentConfig, err := ReadConfig()
+	if err != nil {
+		return err
+	}
+
+	switch configIndex {
+	case 0:
+		currentConfig.ChatGptApiKey = updateConfigParamStr
+	case 1:
+		currentConfig.UseLanguage = updateConfigParamInt
+	case 2:
+		currentConfig.CommitFormat = updateConfigParamInt
+	case 3:
+		currentConfig.AISource = updateConfigParamInt
+	}
+
+	err = WriteConfig(currentConfig)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

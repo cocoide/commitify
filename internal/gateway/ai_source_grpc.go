@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/cocoide/commitify/internal/entity"
-	"github.com/cocoide/commitify/internal/service"
 	pb "github.com/cocoide/commitify/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -41,7 +40,7 @@ func NewGrpcServeGateway() *grpcServeGateway {
 	return gsg
 }
 
-func (gsg grpcServeGateway) FetchCommitMessages() ([]string, error) {
+func (gsg grpcServeGateway) FetchCommitMessages(fileDiffStr string) ([]string, error) {
 	// 設定情報を取得
 	conf, err := entity.ReadConfig()
 	if err != nil {
@@ -49,16 +48,8 @@ func (gsg grpcServeGateway) FetchCommitMessages() ([]string, error) {
 	}
 	cft, lt := conf.Config2PbVars()
 
-	fds := service.NewFileDiffService()
-
-	diffStr, err := fds.CreateFileDiffStr()
-	if err != nil {
-		log.Fatal("差分の取得に失敗: ", err)
-		return nil, err
-	}
-
 	req := &pb.CommitMessageRequest{
-		InputCode:  diffStr,
+		InputCode:  fileDiffStr,
 		CodeFormat: cft,
 		Language:   lt,
 	}
