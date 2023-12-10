@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option go_package = "proto/src";
+
+package separate_commit;
+
+import "code_type.proto";
+
+service SeparateCommitService {
+  rpc GenerateMultipleCommitMessage(SeparateCommitRequest) returns (SeparateCommitResponse);
+}
+
+// SeparateCommitRequest is the request format for generating messages
+message SeparateCommitRequest {
+  repeated FileChange fileChanges = 1;
+  code_type.CodeFormatType codeFormat = 2;
+  code_type.LanguageType language = 3;
+}
+
+message LineDiff {
+  int32 index = 1;
+  string line = 2;
+}
+
+message CodeDiff {
+  repeated LineDiff added = 1;
+  repeated LineDiff deleted = 2;
+}
+
+message FileChange {
+  CodeDiff codeDiff = 1;
+  string filename = 2;
+  ChangeType changeType = 3;
+}
+
+// ChangeType specifies the type of
+enum ChangeType {
+  UNKNOWN_CHANGE = 0;
+  CREATE = 1;
+  UPDATE = 2;
+  DELETE = 3;
+}
+
+// SeparateCommitResponse returns generated and separated commit messages
+message SeparateCommitResponse {
+  repeated SeparatedCommitMessages separatedCommits = 1;
+}
+
+message SeparatedCommitMessages {
+  repeated string messages = 1;
+  string filename = 2;
+  ChangeType changeType = 3;
+}

@@ -3,7 +3,7 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cocoide/commitify-grpc-server/pkg/pb"
+	pb "github.com/cocoide/commitify/proto/gen"
 	"github.com/spf13/viper"
 	"os"
 )

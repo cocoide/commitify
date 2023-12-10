@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "proto/src";
+
+package code_type;
+
+
+// CodeFormatType specifies the type of commit message to generate
+enum CodeFormatType {
+  UNKNOWN_FORMAT = 0;
+  NORMAL = 1;
+  PREFIX = 2;
+  EMOJI = 3;
+}
+
+// LanguageType specifies the language of the commit message to generate
+enum LanguageType {
+  UNKNOWN_LANGUAGE = 0;
+  ENGLISH =1;
+  JAPANESE =2;
+}

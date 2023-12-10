@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "proto/src";
+
+package commit_message;
+
+import "code_type.proto";
+
+// CommitMessageService provides methods to generate commit messages
+service CommitMessageService {
+    rpc GenerateCommitMessage(CommitMessageRequest) returns (CommitMessageResponse);
+}
+
+// CommitMessageRequest is the request format for generating messages
+message CommitMessageRequest {
+    string inputCode = 1;
+    code_type.CodeFormatType codeFormat = 2;
+    code_type.LanguageType language = 3;
+}
+
+// CommitMessageResponse returns generated commit messages
+message CommitMessageResponse {
+    repeated string messages = 1;
+}
