@@ -9,7 +9,7 @@ type CommitMessageService interface {
 
 // githubに関するデータのinput/output
 type GithubService interface {
-	GetStaginCodeDiff() (string, error)
+	GetStagingCodeDiff() (string, error)
 }
 
 type NLPService interface {

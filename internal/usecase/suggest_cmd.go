@@ -18,7 +18,7 @@ func NewSuggestCmdUsecase(message service.CommitMessageService, github service.G
 }
 
 func (u *SuggestCmdUsecase) GenerateCommitMessages() ([]string, error) {
-	stagingCodeDiff, err := u.github.GetStaginCodeDiff()
+	stagingCodeDiff, err := u.github.GetStagingCodeDiff()
 	// stagingCodeを取捨選択する処理をここに入れる
 	if err != nil {
 		return nil, err
