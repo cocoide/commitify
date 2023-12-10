@@ -38,6 +38,7 @@ type Config struct {
 	UseLanguage   int    `json:"UseLanguage"`
 	CommitFormat  int    `json:"CommitFormat"`
 	AISource      int    `json:"AISource"`
+	GithubToken   string `json:"GithubToken"`
 }
 
 func (c *Config) Config2PbVars() (pb.CodeFormatType, pb.LanguageType) {
@@ -81,7 +82,7 @@ func ReadConfig() (Config, error) {
 	return result, nil
 }
 
-func WriteConfig(config Config) error {
+func (c Config) WriteConfig() error {
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -91,7 +92,7 @@ func WriteConfig(config Config) error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	configMap := make(map[string]interface{})
-	configBytes, err := json.Marshal(config)
+	configBytes, err := json.Marshal(c)
 	if err != nil {
 		return fmt.Errorf("error marshalling config: %s", err.Error())
 	}
@@ -106,6 +107,11 @@ func WriteConfig(config Config) error {
 		return fmt.Errorf("error saving config file, %s", err.Error())
 	}
 	return nil
+}
+
+func (c *Config) WithGithubToken(token string) *Config {
+	c.GithubToken = token
+	return c
 }
 
 func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr string) error {
@@ -125,7 +131,7 @@ func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr stri
 		currentConfig.AISource = updateConfigParamInt
 	}
 
-	err = WriteConfig(currentConfig)
+	err = currentConfig.WriteConfig()
 	if err != nil {
 		return err
 	}
@@ -133,7 +139,7 @@ func SaveConfig(configIndex, updateConfigParamInt int, updateConfigParamStr stri
 	return nil
 }
 
-func (c *Config) WithGptRequestLocation() GptRequestLocation {
+func (c *Config) GptRequestLocation() GptRequestLocation {
 	switch c.AISource {
 	case 0:
 		return Server

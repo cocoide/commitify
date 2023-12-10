@@ -129,7 +129,7 @@ func NewSuggestModel() *suggestModel {
 	if err != nil {
 		log.Fatalf("設定ファイルの読み込みができませんでした")
 	}
-	switch config.WithGptRequestLocation() {
+	switch config.GptRequestLocation() {
 	case entity.Client:
 		nlp := gateway.NewOpenAIGateway(context.Background())
 		commitMessageService = gateway.NewClientCommitMessageGateway(nlp)
