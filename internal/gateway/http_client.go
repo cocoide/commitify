@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,6 +29,11 @@ func (h *HttpClient) WithBaseURL(baseURL string) *HttpClient {
 	return h
 }
 
+func (h *HttpClient) WithHeader(key, value string) *HttpClient {
+	h.Headers[key] = value
+	return h
+}
+
 func (h *HttpClient) WithBearerToken(token string) *HttpClient {
 	h.Headers["Authorization"] = fmt.Sprintf("Bearer %s", token)
 	return h
@@ -51,6 +57,11 @@ const (
 	DELTE
 	PUT
 )
+
+func (h *HttpClient) WithBody(values []byte) *HttpClient {
+	h.Body = bytes.NewReader(values)
+	return h
+}
 
 func (h *HttpClient) Execute(method HttpMethod) ([]byte, error) {
 	var methodName string
