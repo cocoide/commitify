@@ -6,9 +6,9 @@ require (
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.24.2
 	github.com/charmbracelet/lipgloss v0.7.1
-	github.com/cocoide/commitify-grpc-server v0.0.0-20230925123729-e460fb67f971
 	github.com/fatih/color v1.15.0
 	github.com/golang/mock v1.6.0
+	github.com/pkg/errors v0.9.1
 	github.com/sashabaranov/go-openai v1.15.2
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
@@ -48,6 +48,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/term v0.12.0 // indirect
