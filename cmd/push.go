@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cocoide/commitify/internal/entity"
@@ -31,7 +32,7 @@ type pushModel struct {
 
 type prInput struct {
 	titleInput textinput.Model
-	bodyInput  textinput.Model
+	bodyInput  textarea.Model
 }
 
 type PushCmdStep int
@@ -158,11 +159,11 @@ func (m *pushModel) View() string {
 	case SelectBaseBranch:
 		return m.buildSelectBaseBranchText()
 	case ConfirmPR:
-		return color.HiWhiteString("<生成されたPRの確認: TabKeyで編集, EnterでPush>") + fmt.Sprintf("\n\nTitle: %s\n\nBody: %s", m.pr.Title, m.pr.Body)
+		return color.HiWhiteString("<生成されたPRの確認: TabKeyで編集, EnterでPush>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.pr.Title, m.pr.Body)
 	case EditPRTitle:
-		return color.HiWhiteString("<Titleの編集: Enterで確定>") + fmt.Sprintf("\n\nTitle: %s\n\nBody: %s", m.prInput.titleInput.View(), m.pr.Body)
+		return color.HiWhiteString("<Titleの編集: Enterで確定>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.prInput.titleInput.View(), m.pr.Body)
 	case EditPRBody:
-		return color.HiWhiteString("<Bodyの編集: EnterでPush>") + fmt.Sprintf("\n\nTitle: %s\n\nBody: %s", m.pr.Title, m.prInput.bodyInput.View())
+		return color.HiWhiteString("<Bodyの編集: EnterでPush>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.pr.Title, m.prInput.bodyInput.View())
 	case SubmitPR:
 		return fmt.Sprintf("**🎉PRの作成に成功**")
 	}
@@ -196,7 +197,7 @@ func NewPushModel() *pushModel {
 		loadMsg:  "",
 		prInput: &prInput{
 			titleInput: textinput.New(),
-			bodyInput:  textinput.New(),
+			bodyInput:  textarea.New(),
 		},
 	}
 }
@@ -255,7 +256,8 @@ func (m *pushModel) focusInPRBody() {
 	input.Focus()
 	input.SetValue(m.pr.Body)
 	input.CharLimit = 1000
-	input.Width = 500
+	input.SetWidth(100)
+	input.SetHeight(len(m.pr.Body) / 100)
 	m.prInput.bodyInput = input
 }
 
