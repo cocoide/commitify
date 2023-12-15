@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
-	"log"
 	"net/url"
 	"strconv"
 	"time"
@@ -106,7 +105,6 @@ func (u *LoginCmdUsecase) ScheduleVerifyAuth(req *ScheduleVerifyAuthRequest) err
 				if err := config.WriteConfig(); err != nil {
 					return err
 				}
-				log.Print("**SSO認証が成功しました**")
 				return nil
 			}
 			if newIntervalStr := values.Get("interval"); newIntervalStr != "" {
