@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/internal/service"
 	"github.com/cocoide/commitify/internal/usecase"
 	"golang.org/x/net/context"
-	"log"
-	"os"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -135,6 +136,10 @@ func NewSuggestModel() *suggestModel {
 		commitMessageService = gateway.NewClientCommitMessageGateway(nlp)
 	case entity.Server:
 		commitMessageService = gateway.NewGrpcServerGateway()
+	case entity.Qdrant:
+		commitMessageService = gateway.NewQdrantServerGateway()
+	case entity.Gemini:
+		commitMessageService = gateway.NewGeminiServerGateway()
 	}
 	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(commitMessageService, github)
 
