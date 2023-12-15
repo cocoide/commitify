@@ -11,10 +11,11 @@ import (
 )
 
 type githubGateway struct {
+	client *HttpClient
 }
 
-func NewGithubGateway() service.GithubService {
-	return &githubGateway{}
+func NewGithubGateway(client *HttpClient) service.GithubService {
+	return &githubGateway{client: client}
 }
 
 func (g *githubGateway) GetStagingCodeDiff() (string, error) {
@@ -64,7 +65,7 @@ func (g *githubGateway) CreatePullRequest(req *entity.PullRequest, token string)
 	if err != nil {
 		return err
 	}
-	_, err = NewHttpClient().
+	_, err = g.client.
 		WithBaseURL(fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls", req.Owner, req.Repo)).
 		WithHeader("Accept", "application/vnd.github+json").
 		WithHeader("X-GitHub-Api-Version", "2022-11-28").

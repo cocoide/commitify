@@ -110,5 +110,9 @@ func (h *HttpClient) Execute(method HttpMethod) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("request failed with status code: %d, resBody: %v", resp.StatusCode, string(body))
+	}
 	return body, nil
 }
