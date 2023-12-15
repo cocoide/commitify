@@ -67,6 +67,7 @@ func (g *githubGateway) CreatePullRequest(req *entity.PullRequest, token string)
 	_, err = NewHttpClient().
 		WithBaseURL(fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls", req.Owner, req.Repo)).
 		WithHeader("Accept", "application/vnd.github+json").
+		WithHeader("X-GitHub-Api-Version", "2022-11-28").
 		WithBearerToken(token).
 		WithBody(b).
 		Execute(POST)
