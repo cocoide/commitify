@@ -2,9 +2,9 @@ package gateway
 
 import (
 	"crypto/tls"
-	"github.com/cocoide/commitify-grpc-server/pkg/pb"
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/service"
+	pb "github.com/cocoide/commitify/proto/gen"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
