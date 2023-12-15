@@ -5,11 +5,12 @@ package cmd
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/cocoide/commitify/internal/gateway"
 	"github.com/cocoide/commitify/internal/usecase"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"sync"
 )
 
 const (
@@ -48,7 +49,7 @@ var loginCmd = &cobra.Command{
 		if err != nil {
 			fmt.Printf("🚨認証エラーが発生: %v", err)
 		} else {
-			fmt.Printf("**🎉認証が正常に完了**")
+			fmt.Printf("**🎉認証が正常に完了**\n")
 		}
 	},
 }
