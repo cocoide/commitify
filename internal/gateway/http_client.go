@@ -9,23 +9,23 @@ import (
 )
 
 type HttpClient struct {
-	Client   *http.Client
-	Endpoint string
-	Headers  map[string]string
-	Params   map[string]interface{}
-	Body     io.Reader
+	client   *http.Client
+	endpoint string
+	headers  map[string]string
+	params   map[string]interface{}
+	body     io.Reader
 }
 
 func NewHttpClient() *HttpClient {
 	return &HttpClient{
-		Client:  &http.Client{},
-		Headers: make(map[string]string),
-		Params:  make(map[string]interface{}),
+		client:  &http.Client{},
+		headers: make(map[string]string),
+		params:  make(map[string]interface{}),
 	}
 }
 
 func (h *HttpClient) WithBaseURL(baseURL string) *HttpClient {
-	h.Endpoint = baseURL
+	h.endpoint = baseURL
 	return h
 }
 
@@ -35,17 +35,17 @@ func (h *HttpClient) WithHeader(key, value string) *HttpClient {
 }
 
 func (h *HttpClient) WithBearerToken(token string) *HttpClient {
-	h.Headers["Authorization"] = fmt.Sprintf("Bearer %s", token)
+	h.headers["Authorization"] = fmt.Sprintf("Bearer %s", token)
 	return h
 }
 
 func (h *HttpClient) WithPath(path string) *HttpClient {
-	h.Endpoint = h.Endpoint + "/" + path
+	h.endpoint = h.endpoint + "/" + path
 	return h
 }
 
 func (h *HttpClient) WithParam(key string, value interface{}) *HttpClient {
-	h.Params[key] = value
+	h.params[key] = value
 	return h
 }
 
@@ -75,19 +75,19 @@ func (h *HttpClient) Execute(method HttpMethod) ([]byte, error) {
 	case PUT:
 		methodName = "PUT"
 	}
-	client := h.Client
+	client := h.client
 
-	req, err := http.NewRequest(methodName, h.Endpoint, h.Body)
+	req, err := http.NewRequest(methodName, h.endpoint, h.body)
 	if err != nil {
 		return nil, err
 	}
 
-	for k, v := range h.Headers {
+	for k, v := range h.headers {
 		req.Header.Add(k, v)
 	}
 
 	query := req.URL.Query()
-	for key, value := range h.Params {
+	for key, value := range h.params {
 		switch v := value.(type) {
 		case string:
 			query.Add(key, v)
