@@ -65,6 +65,7 @@ func (g *githubGateway) CreatePullRequest(req *entity.PullRequest, token string)
 	if err != nil {
 		return err
 	}
+	// API参照ドキュメント: https://docs.github.com/ja/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request--code-samples
 	_, err = g.client.
 		WithBaseURL(fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls", req.Owner, req.Repo)).
 		WithHeader("Accept", "application/vnd.github+json").
@@ -110,4 +111,8 @@ func (g *githubGateway) GetRecentUpdatedBranch() ([]string, error) {
 		result = append(result, branch)
 	}
 	return result, nil
+}
+
+func (g *githubGateway) ExecPush(base string) ([]string, error) {
+
 }
