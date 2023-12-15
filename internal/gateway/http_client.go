@@ -30,7 +30,7 @@ func (h *HttpClient) WithBaseURL(baseURL string) *HttpClient {
 }
 
 func (h *HttpClient) WithHeader(key, value string) *HttpClient {
-	h.Headers[key] = value
+	h.headers[key] = value
 	return h
 }
 
@@ -59,7 +59,7 @@ const (
 )
 
 func (h *HttpClient) WithBody(values []byte) *HttpClient {
-	h.Body = bytes.NewReader(values)
+	h.body = bytes.NewReader(values)
 	return h
 }
 
