@@ -14,8 +14,8 @@ type githubGateway struct {
 	client *HttpClient
 }
 
-func NewGithubGateway(client *HttpClient) service.GithubService {
-	return &githubGateway{client: client}
+func NewGithubGateway() service.GithubService {
+	return &githubGateway{client: NewHttpClient()}
 }
 
 func (g *githubGateway) GetStagingCodeDiff() (string, error) {

@@ -16,10 +16,9 @@ func Test_CreatePullRequest(t *testing.T) {
 		log.Fatal(err)
 	}
 	tkn := conf.GithubToken
-	http := NewHttpClient()
 	pr := &entity.PullRequest{
 		Owner: "cocoide", Repo: "commitify", Title: "test title", Body: "test body", Head: TestHeadBranch, Base: "main"}
-	u := NewGithubGateway(http)
+	u := NewGithubGateway()
 	if err := u.CreatePullRequest(pr, tkn); err != nil {
 		t.Error(err)
 	}

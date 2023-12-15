@@ -123,8 +123,7 @@ func NewSuggestModel() *suggestModel {
 	ti.Focus()
 
 	// suggestコマンドのサービスの取得
-	http := gateway.NewHttpClient()
-	github := gateway.NewGithubGateway(http)
+	github := gateway.NewGithubGateway()
 	var commitMessageService service.CommitMessageService
 	config, err := entity.ReadConfig()
 	if err != nil {
