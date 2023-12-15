@@ -9,11 +9,11 @@
 package mock_service
 
 import (
-	"github.com/golang/mock/gomock"
 	reflect "reflect"
 
 	entity "github.com/cocoide/commitify/internal/entity"
 	service "github.com/cocoide/commitify/internal/service"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockGithubService is a mock of GithubService interface.
@@ -126,4 +126,18 @@ func (m *MockGithubService) GetUnPushedCommits(base string) ([]string, error) {
 func (mr *MockGithubServiceMockRecorder) GetUnPushedCommits(base any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnPushedCommits", reflect.TypeOf((*MockGithubService)(nil).GetUnPushedCommits), base)
+}
+
+// PushCurrentBranch mocks base method.
+func (m *MockGithubService) PushCurrentBranch() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PushCurrentBranch")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PushCurrentBranch indicates an expected call of PushCurrentBranch.
+func (mr *MockGithubServiceMockRecorder) PushCurrentBranch() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushCurrentBranch", reflect.TypeOf((*MockGithubService)(nil).PushCurrentBranch))
 }

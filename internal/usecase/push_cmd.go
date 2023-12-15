@@ -60,6 +60,10 @@ func (u *PushCmdUsecase) GeneratePullRequest(base string) (*entity.PullRequest, 
 }
 
 func (u *PushCmdUsecase) SubmitPullRequest(pr *entity.PullRequest) error {
+	if err := u.github.PushCurrentBranch(); err != nil {
+		return err
+	}
+	// CurrentブランチにPRが作成されてる場合以下は実行しない仕様にしたい(エラーが発生するので)
 	config, err := entity.ReadConfig()
 	if err != nil {
 		return err

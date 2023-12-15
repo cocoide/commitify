@@ -113,6 +113,13 @@ func (g *githubGateway) GetRecentUpdatedBranch() ([]string, error) {
 	return result, nil
 }
 
-func (g *githubGateway) ExecPush(base string) ([]string, error) {
-
+func (g *githubGateway) PushCurrentBranch() error {
+	head, err := g.GetCurrentBranch()
+	if err != nil {
+		return err
+	}
+	if _, err = exec.Command("git", "push", "origin", head).Output(); err != nil {
+		return fmt.Errorf("failed to push branch %s: %w", head, err)
+	}
+	return nil
 }

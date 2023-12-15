@@ -15,4 +15,5 @@ type GithubService interface {
 	GetCurrentBranch() (string, error)
 	GetUnPushedCommits(base string) ([]string, error)
 	GetRecentUpdatedBranch() ([]string, error)
+	PushCurrentBranch() error
 }
