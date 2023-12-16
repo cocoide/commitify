@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -15,7 +17,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
-	"strings"
 )
 
 type pushModel struct {
@@ -133,8 +134,6 @@ func (m *pushModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.finishLoading()
 	case submitPRMsg:
 		if msg.err != nil {
-			// リファクタ: github tokenがexpireした時は、loginコマンドを自動実行
-			// → tokenがexpireしたときのエラーを調べないといけない...
 			m.errMsg = fmt.Sprintf("🚨PR提出中にエラーが発生: %v", msg.err)
 		}
 		m.finishLoading()
@@ -247,7 +246,7 @@ func (m *pushModel) focusInPRBody() {
 	input := m.prInput.bodyInput
 	input.Focus()
 	input.SetValue(m.pr.Body)
-	input.CharLimit = 5000
+	input.CharLimit = 2000
 	input.SetWidth(200)
 	m.prInput.bodyInput = input
 }
