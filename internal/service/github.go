@@ -7,7 +7,6 @@ type GetRepoDetailsResponse struct {
 	Repo  string
 }
 
-//go:generate mockgen -source=github.go -destination=../../mock/github.go
 type GithubService interface {
 	GetStagingCodeDiff() (string, error)
 	GetCurrentRepoDetails() (*GetRepoDetailsResponse, error)
