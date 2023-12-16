@@ -5,6 +5,7 @@ import (
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/service"
+	"github.com/pkg/errors"
 )
 
 type geminiServerGateway struct {
@@ -21,6 +22,10 @@ func NewGeminiServerGateway() service.CommitMessageService {
 }
 
 func (qs *geminiServerGateway) GenerateCommitMessageList(diff string, conf entity.Config) ([]string, error) {
+	if diff == "" {
+		return nil, errors.New("ステージされた変更がありません。")
+	}
+
 	type geminiBody struct {
 		Diff string `json:"diff"`
 	}

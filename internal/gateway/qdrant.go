@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/service"
@@ -18,6 +19,10 @@ func NewQdrantServerGateway() service.CommitMessageService {
 }
 
 func (qs *qdrantServerGateway) GenerateCommitMessageList(diff string, conf entity.Config) ([]string, error) {
+	if diff == "" {
+		return nil, errors.New("ステージされた変更がありません。")
+	}
+
 	type qdrantBody struct {
 		Diff string `json:"diff"`
 	}
