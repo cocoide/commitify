@@ -123,7 +123,7 @@ func NewSuggestModel() *suggestModel {
 	ti.Focus()
 
 	// suggestコマンドのサービスの取得
-	inputOutput := gateway.NewInputOutputGateway()
+	github := gateway.NewGithubGateway()
 	var commitMessageService service.CommitMessageService
 	config, err := entity.ReadConfig()
 	if err != nil {
@@ -136,7 +136,7 @@ func NewSuggestModel() *suggestModel {
 	case entity.Server:
 		commitMessageService = gateway.NewGrpcServerGateway()
 	}
-	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(commitMessageService, inputOutput)
+	suggestCmdUsecase := usecase.NewSuggestCmdUsecase(commitMessageService, github)
 
 	return &suggestModel{
 		choices:    []string{""},

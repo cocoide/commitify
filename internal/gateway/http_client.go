@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,6 +29,11 @@ func (h *HttpClient) WithBaseURL(baseURL string) *HttpClient {
 	return h
 }
 
+func (h *HttpClient) WithHeader(key, value string) *HttpClient {
+	h.headers[key] = value
+	return h
+}
+
 func (h *HttpClient) WithBearerToken(token string) *HttpClient {
 	h.headers["Authorization"] = fmt.Sprintf("Bearer %s", token)
 	return h
@@ -51,6 +57,11 @@ const (
 	DELTE
 	PUT
 )
+
+func (h *HttpClient) WithBody(values []byte) *HttpClient {
+	h.body = bytes.NewReader(values)
+	return h
+}
 
 func (h *HttpClient) Execute(method HttpMethod) ([]byte, error) {
 	var methodName string
@@ -98,6 +109,10 @@ func (h *HttpClient) Execute(method HttpMethod) ([]byte, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("request failed with status code: %d, resBody: %v", resp.StatusCode, string(body))
 	}
 	return body, nil
 }
