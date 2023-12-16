@@ -39,7 +39,6 @@ type PushCmdStep int
 
 const (
 	SelectBaseBranch PushCmdStep = iota
-	ConfirmPR
 	EditPRTitle
 	EditPRBody
 	SubmitPR
@@ -78,11 +77,16 @@ func (m *pushModel) submitPRCmd() tea.Cmd {
 func (m *pushModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
-
+		case tea.KeyCtrlE:
+			m.step--
 		}
 		switch m.step {
 		case SelectBaseBranch:
@@ -98,17 +102,6 @@ func (m *pushModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tea.KeyEnter:
 				m.loadMsg = "PRを生成中..."
 				return m, m.generatePRCmd()
-			}
-		case ConfirmPR:
-			switch msg.Type {
-			case tea.KeyTab:
-				m.step = EditPRTitle
-				m.focusInPRTitle()
-				return m, cmd
-			case tea.KeyEnter:
-				m.step = SubmitPR
-				m.loadMsg = "PRを提出中..."
-				return m, m.submitPRCmd()
 			}
 		case EditPRTitle:
 			cmd = m.updateTitleInput(msg)
@@ -134,7 +127,8 @@ func (m *pushModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.errMsg = fmt.Sprintf("🚨PR生成中にエラーが発生: %v", msg.err)
 		} else {
 			m.pr = msg.pr
-			m.step = ConfirmPR
+			m.step = EditPRTitle
+			m.focusInPRTitle()
 		}
 		m.finishLoading()
 	case submitPRMsg:
@@ -158,12 +152,10 @@ func (m *pushModel) View() string {
 	switch m.step {
 	case SelectBaseBranch:
 		return m.buildSelectBaseBranchText()
-	case ConfirmPR:
-		return color.HiWhiteString("<生成されたPRの確認: TabKeyで編集, EnterでPush>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.pr.Title, m.pr.Body)
 	case EditPRTitle:
-		return color.HiWhiteString("<Titleの編集: Enterで確定>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.prInput.titleInput.View(), m.pr.Body)
+		return color.HiWhiteString("<Titleの編集: Enterで確定>\n\n") + fmt.Sprintf("Title:\n%s", m.prInput.titleInput.View())
 	case EditPRBody:
-		return color.HiWhiteString("<Bodyの編集: EnterでPush>") + fmt.Sprintf("\n\nTitle:\n%s\n\nBody:\n%s", m.pr.Title, m.prInput.bodyInput.View())
+		return color.HiWhiteString("<Bodyの編集: EnterでPush&PR提出, Ctrl+Eで戻る>\n\n") + fmt.Sprintf("Body:\n%s", m.prInput.bodyInput.View())
 	case SubmitPR:
 		return fmt.Sprintf("**🎉PRの作成に成功**")
 	}
@@ -255,9 +247,8 @@ func (m *pushModel) focusInPRBody() {
 	input := m.prInput.bodyInput
 	input.Focus()
 	input.SetValue(m.pr.Body)
-	input.CharLimit = 1000
-	input.SetWidth(100)
-	input.SetHeight(len(m.pr.Body) / 100)
+	input.CharLimit = 5000
+	input.SetWidth(200)
 	m.prInput.bodyInput = input
 }
 

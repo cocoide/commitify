@@ -14,7 +14,7 @@ type PushCmdUsecase struct {
 }
 
 const (
-	GeneratePRFromCommitsPrompt = "generate pull request content from commit messages [%s] in Japanese"
+	GeneratePRFromCommitsPrompt = "generate pull request body from commit messages [%s] in Japanese"
 	GeneratePRTitleFromPRBody   = "generate pull request title from pr body [%s] in Japanese as one sentence like 〇〇の機能追加"
 )
 
