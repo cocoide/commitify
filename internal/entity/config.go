@@ -3,9 +3,10 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	pb "github.com/cocoide/commitify/proto/gen"
 	"github.com/spf13/viper"
-	"os"
 )
 
 // コミットメッセージの言語の列挙型
@@ -31,6 +32,8 @@ type GptRequestLocation int
 const (
 	Server GptRequestLocation = iota
 	Client
+	Qdrant
+	Gemini
 )
 
 type Config struct {
@@ -145,6 +148,10 @@ func (c *Config) GptRequestLocation() GptRequestLocation {
 		return Server
 	case 1:
 		return Client
+	case 2:
+		return Qdrant
+	case 3:
+		return Gemini
 	default:
 		return Server
 	}

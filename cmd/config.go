@@ -18,13 +18,13 @@ var (
 		{},
 		{int(entity.EN), int(entity.JP)},
 		{int(entity.NormalFormat), int(entity.EmojiFormat), int(entity.PrefixFormat)},
-		{int(entity.Server), int(entity.Client)},
+		{int(entity.Server), int(entity.Client), int(entity.Qdrant), int(entity.Gemini)},
 	}
 	configOptionLabel = [][]string{
 		{},
 		{"English", "Japanese"},
 		{"Normal Format", "Emoji Format", "PrefixFormat"},
-		{"Wrap Server", "OpenAI API"},
+		{"Wrap Server", "OpenAI API", "Qdrant Database", "Gemini API"},
 	}
 )
 
