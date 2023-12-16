@@ -13,7 +13,7 @@ import (
 
 	entity "github.com/cocoide/commitify/internal/entity"
 	service "github.com/cocoide/commitify/internal/service"
-	gomock "go.uber.org/mock/gomock"
+	"github.com/golang/mock/gomock"
 )
 
 // MockGithubService is a mock of GithubService interface.
