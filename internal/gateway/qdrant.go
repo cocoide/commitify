@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/cocoide/commitify/internal/entity"
 	"github.com/cocoide/commitify/internal/service"
@@ -39,7 +38,6 @@ func (qs *qdrantServerGateway) GenerateCommitMessageList(diff string, conf entit
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print(string(res))
 
 	type qdrantResponse struct {
 		Messages []string `json:"messages"`
